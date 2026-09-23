@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# SQLite database
+*.db
+
+# Node
+node_modules/
+
+# Build files
+dist/

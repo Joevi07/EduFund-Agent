@@ -9,6 +9,7 @@ import ApplicationAutopilotView from "./components/ApplicationAutopilotView";
 import PipelineTrackerView from "./components/PipelineTrackerView";
 import AuthView from "./components/AuthView";
 import AdminView from "./components/AdminView";
+import UserGuideView from "./components/UserGuideView";
 
 import { 
   fetchHealth, 
@@ -16,7 +17,9 @@ import {
   fetchOpportunities, 
   generateFundingPlan,
   fetchApplications,
-  updateApplicationStatus
+  updateApplicationStatus,
+  fetchMyProfile,
+  saveMyProfile
 } from "./services/api";
 
 const INITIAL_PROFILE = {
@@ -107,22 +110,30 @@ export default function App() {
       const health = await fetchHealth();
       setBackendConnected(health.status === "ok");
 
-      const opps = await fetchOpportunities();
+      let activeProfile = profile;
+      if (auth) {
+        const stored = await fetchMyProfile(auth.token).catch(() => null);
+        activeProfile = stored || { ...INITIAL_PROFILE, id: auth.user.id, name: auth.user.name, course: "", interests: [], achievements: [], academic_profile: { gpa: 0, max_gpa: 4, standardized_test: "", year_of_study: "" }, location: { country: "India", state: "", city: "", study_destination: "India" }, financial_constraints: { annual_family_income_inr: 0, target_annual_cost_inr: 0, confirmed_aid_inr: 0, currency: "INR" } };
+        setProfile(activeProfile);
+      }
+      const opps = await fetchOpportunities("All", "", activeProfile);
       setOpportunities(opps);
 
-      const planData = await generateFundingPlan(profile);
+      const planData = await generateFundingPlan(activeProfile);
       if (planData) setPlan(planData);
 
       const applicationData = await fetchApplications();
       setApplications(applicationData);
     }
     initData();
-  }, []);
+  }, [auth]);
 
   const handleSaveProfile = async (updatedProfile) => {
-    setProfile(updatedProfile);
-    const planData = await generateFundingPlan(updatedProfile);
+    const saved = await saveMyProfile(updatedProfile, auth.token).catch(() => updatedProfile);
+    setProfile(saved);
+    const [planData, opps] = await Promise.all([generateFundingPlan(saved), fetchOpportunities("All", "", saved)]);
     if (planData) setPlan(planData);
+    setOpportunities(opps);
   };
 
   const handleSelectAutopilot = (opp) => {
@@ -176,6 +187,7 @@ export default function App() {
               currency={currency}
               onNavigate={setActiveTab}
               onScenarioResult={handleScenarioResult}
+              opportunitiesCount={opportunities.length}
             />
           )}
 
@@ -224,6 +236,7 @@ export default function App() {
           )}
 
           {activeTab === "admin" && auth.user.role === "admin" && <AdminView token={auth.token} />}
+          {activeTab === "guide" && <UserGuideView onNavigate={setActiveTab} />}
         </main>
       </div>
     </div>

@@ -18,7 +18,7 @@ from models import (
     DocumentAuditResponse,
     StrategySimulateRequest,
     ApplicationRecord,
-    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse
+    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse, DiscoveryRequest
 )
 from data.opportunities import get_all_opportunities, get_opportunity_by_id
 from agents.profile_agent import ProfileAgent
@@ -28,7 +28,7 @@ from agents.planner_agent import PlannerAgent
 from agents.autopilot_agent import AutopilotAgent
 from agents.deadline_agent import DeadlineAgent
 from database import (init_db, list_applications, upsert_application, save_opportunity, create_user,
-    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin)
+    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin, save_student_profile, get_student_profile)
 
 # Initialize SQLite database on startup
 init_db()
@@ -117,6 +117,22 @@ def health_check():
 @app.post("/api/profile/process")
 def process_profile(profile: StudentProfile):
     return profile_agent.process_profile(profile)
+
+@app.get("/api/profile/me", response_model=Optional[StudentProfile])
+def get_my_profile(authorization: Optional[str] = Header(None)):
+    user = current_user(authorization)
+    profile = get_student_profile(user["id"])
+    return StudentProfile(**profile) if profile else None
+
+@app.put("/api/profile/me", response_model=StudentProfile)
+def save_my_profile(profile: StudentProfile, authorization: Optional[str] = Header(None)):
+    user = current_user(authorization)
+    data = profile.model_dump(); data["id"] = user["id"]; data["name"] = profile.name or user["name"]
+    return save_student_profile(data)
+
+@app.post("/api/discovery", response_model=List[Opportunity])
+def discover_for_profile(request: DiscoveryRequest):
+    return discovery_agent.discover(request.profile, category_filter=request.category, search_query=request.query)
 
 @app.get("/api/opportunities", response_model=List[Opportunity])
 def list_opportunities(category: Optional[str] = None, q: Optional[str] = None):

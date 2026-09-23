@@ -1,0 +1,14 @@
+import React from "react";
+import { BookOpen, CheckCircle2, Compass, FileText, Flag, Target, UserRound } from "lucide-react";
+
+const steps = [
+  { icon: UserRound, title: "Build your funding profile", detail: "Open Profile Agent and add your course, year, GPA, location, family-income range, achievements, and annual study cost. Your details stay editable.", action: "Profile Agent" },
+  { icon: Target, title: "Understand the funding gap", detail: "Funding Planner subtracts confirmed aid from your annual cost, then ranks opportunities by eligibility and expected value—not just the advertised award.", action: "Funding Planner" },
+  { icon: Compass, title: "Verify every opportunity", detail: "Use Opportunity Market to see real programmes. Open the official-source link before applying: provider rules, dates, and award values can change each cycle.", action: "Opportunity Market" },
+  { icon: FileText, title: "Prepare, never auto-submit", detail: "Autopilot creates a document checklist and editable draft. Upload and verify documents, then review every statement yourself. EduFund never submits an application for you.", action: "Autopilot Studio" },
+  { icon: Flag, title: "Track the application pipeline", detail: "Move each card from Discovered to Planned, Drafting, Ready to Submit, and Submitted. Prioritize high-urgency deadlines first.", action: "Pipeline & Deadlines" },
+];
+
+export default function UserGuideView({ onNavigate }) {
+  return <div className="guide-view"><div className="page-heading"><span className="eyebrow">START HERE</span><h2>Your EduFund playbook</h2><p>A simple, safe path from funding gap to a submitted application.</p></div><div className="guide-notice"><CheckCircle2 size={20}/><div><strong>Use verified sources.</strong><span> Eligibility decisions and final applications always happen on the official programme website.</span></div></div><div className="guide-steps">{steps.map((step, index) => { const Icon = step.icon; return <article className="guide-step" key={step.title}><div className="guide-number">{index + 1}</div><div className="guide-icon"><Icon size={20}/></div><div><h3>{step.title}</h3><p>{step.detail}</p><button className="guide-action" onClick={() => onNavigate(step.action === "Profile Agent" ? "profile" : step.action === "Funding Planner" ? "planner" : step.action === "Opportunity Market" ? "discovery" : step.action === "Autopilot Studio" ? "autopilot" : "pipeline")}>Open {step.action} →</button></div></article>})}</div><section className="guide-checklist"><BookOpen size={21}/><div><h3>Before you apply: keep these ready</h3><p>Government photo ID, official marksheets/transcript, income proof where required, admission/bonafide certificate, fee receipt, and an Aadhaar-linked bank account where the scheme requests it. Never share passwords or OTPs with anyone.</p></div></section></div>;
+}

@@ -166,3 +166,8 @@ class UserPublic(BaseModel):
 class AuthResponse(BaseModel):
     token: str
     user: UserPublic
+
+class DiscoveryRequest(BaseModel):
+    profile: StudentProfile
+    category: Optional[str] = None
+    query: Optional[str] = None

@@ -1,115 +1,97 @@
 import React from "react";
-import { Target, TrendingUp, Zap, Sliders } from "lucide-react";
+import { Target, TrendingUp, Zap, ArrowRight } from "lucide-react";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 
 export default function FundingPlannerView({ plan, profile, currency, onNavigate, onScenarioResult }) {
   const isINR = currency === "INR";
-  const sym = isINR ? "₹" : "$";
-  const formatAmt = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
+  const fmt   = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
 
-  const gap = isINR ? plan.funding_gap_inr : plan.funding_gap_usd;
-  const coverage = isINR ? plan.potential_coverage_inr : plan.potential_coverage_usd;
+  const equations = [
+    { label:"Total Annual Cost",     val: fmt(plan.total_cost_inr, plan.total_cost_usd),       op:"",  color:"var(--text-primary)",  bg:"rgba(255,255,255,.7)" },
+    { label:"Confirmed Aid",         val:`− ${fmt(plan.confirmed_aid_inr, plan.confirmed_aid_usd)}`, op:"-", color:"var(--accent-sage)",  bg:"rgba(41,165,87,.08)", border:"rgba(41,165,87,.2)" },
+    { label:"Remaining Funding Gap", val:`= ${fmt(plan.funding_gap_inr, plan.funding_gap_usd)}`, op:"=",  color:"var(--amber-500)",     bg:"rgba(217,119,6,.08)", border:"rgba(217,119,6,.2)" },
+  ];
+
+  const urgencyColor = (u) => u === "HIGH" ? "badge-low" : u === "MEDIUM" ? "badge-medium" : "badge-high";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
+
+      {/* ── Heading ── */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
-          <Target size={22} color="var(--neon-indigo)" />
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>Agent 3 — Funding Planner Strategy Engine</h2>
+        <div style={{ display:"flex", alignItems:"center", gap:".5rem", marginBottom:".3rem" }}>
+          <div style={{ background:"linear-gradient(135deg,var(--teal-500),var(--teal-600))", borderRadius:9, padding:7, boxShadow:"0 3px 12px rgba(18,163,165,.3)" }}>
+            <Target size={18} color="#fff"/>
+          </div>
+          <h2 style={{ fontSize:"1.55rem", fontWeight:800, letterSpacing:"-.035em" }}>Funding Planner — Strategy Engine</h2>
         </div>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-          Solves for optimal funding coverage to close the Education Funding Gap using Expected Value ($EV$).
+        <p style={{ color:"var(--text-secondary)", fontSize:".88rem", marginLeft:"2.5rem" }}>
+          Solves for optimal coverage using Expected Value (EV) to close your education funding gap.
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "1.5rem" }}>
-        {/* FinTech Gap Breakdown Card */}
-        <div className="bento-box" style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.9), rgba(5,8,17,0.95))" }}>
-          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem" }}>Education Funding Equation</h3>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-            <div style={{ background: "rgba(255,255,255,0.03)", padding: "0.85rem", borderRadius: "var(--radius-sm)", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>Total Annual Cost</span>
-              <strong style={{ fontSize: "1.1rem" }}>{formatAmt(plan.total_cost_inr, plan.total_cost_usd)}</strong>
-            </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(340px,1fr))", gap:"1.4rem" }}>
 
-            <div style={{ background: "rgba(16,185,129,0.08)", padding: "0.85rem", borderRadius: "var(--radius-sm)", display: "flex", justifyContent: "space-between", border: "1px solid rgba(16,185,129,0.2)" }}>
-              <span style={{ fontSize: "0.82rem", color: "var(--neon-emerald)" }}>Confirmed Aid</span>
-              <strong style={{ fontSize: "1.1rem", color: "var(--neon-emerald)" }}>− {formatAmt(plan.confirmed_aid_inr, plan.confirmed_aid_usd)}</strong>
-            </div>
-
-            <div style={{ background: "rgba(245,158,11,0.08)", padding: "0.85rem", borderRadius: "var(--radius-sm)", display: "flex", justifyContent: "space-between", border: "1px solid rgba(245,158,11,0.3)" }}>
-              <span style={{ fontSize: "0.82rem", color: "var(--neon-amber)" }}>Remaining Funding Gap</span>
-              <strong style={{ fontSize: "1.2rem", color: "var(--neon-amber)" }}>= {formatAmt(plan.funding_gap_inr, plan.funding_gap_usd)}</strong>
-            </div>
+        {/* Funding equation card */}
+        <div className="bento-box" style={{ background:"linear-gradient(145deg,rgba(14,122,124,.94),rgba(8,100,100,.97))", border:"1px solid rgba(255,255,255,.18)" }}>
+          <h3 style={{ fontSize:"1.05rem", fontWeight:700, color:"#fff", marginBottom:"1.1rem", display:"flex", alignItems:"center", gap:".45rem" }}>
+            📐 Funding Equation
+          </h3>
+          <div style={{ display:"flex", flexDirection:"column", gap:".75rem" }}>
+            {equations.map(({ label, val, color, bg, border }) => (
+              <div key={label} style={{
+                background: bg || "rgba(255,255,255,.1)",
+                border: `1px solid ${border || "rgba(255,255,255,.15)"}`,
+                backdropFilter:"blur(8px)",
+                padding:".85rem 1rem", borderRadius:10,
+                display:"flex", justifyContent:"space-between", alignItems:"center",
+              }}>
+                <span style={{ fontSize:".82rem", color: border ? color : "rgba(255,255,255,.8)", fontWeight:500 }}>{label}</span>
+                <strong style={{ fontSize:"1.1rem", color: border ? color : "#fff", fontWeight:800 }}>{val}</strong>
+              </div>
+            ))}
           </div>
-
-          <div style={{ marginTop: "1rem", padding: "0.8rem", background: "rgba(99, 102, 241, 0.1)", borderRadius: "var(--radius-sm)", border: "1px solid rgba(99, 102, 241, 0.25)", fontSize: "0.82rem", color: "#a5b4fc" }}>
-            🤖 <strong>Planner Agent Guidance:</strong> {plan.agent_advice}
+          <div style={{ marginTop:"1rem", padding:".8rem 1rem", background:"rgba(255,255,255,.08)", backdropFilter:"blur(8px)", borderRadius:10, border:"1px solid rgba(255,255,255,.15)", fontSize:".82rem", color:"rgba(255,255,255,.85)", lineHeight:1.5 }}>
+            🤖 <strong style={{ color:"#fff" }}>Planner Agent:</strong> {plan.agent_advice}
           </div>
         </div>
 
-        {/* Live Scenario Simulator */}
+        {/* Scenario Simulator */}
         <div className="bento-box">
-          <StrategySimulatorWidget 
-            profile={profile}
-            currency={currency}
-            onScenarioResult={onScenarioResult}
-          />
+          <StrategySimulatorWidget profile={profile} currency={currency} onScenarioResult={onScenarioResult}/>
         </div>
       </div>
 
-      {/* Portfolio Strategy Stack Table */}
+      {/* Strategy table */}
       <div className="bento-box">
-        <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <TrendingUp size={18} color="var(--neon-emerald)" /> Expected Value (EV) Strategy Portfolio
+        <h3 style={{ fontSize:"1.05rem", fontWeight:700, marginBottom:"1.1rem", display:"flex", alignItems:"center", gap:".5rem" }}>
+          <TrendingUp size={18} color="var(--accent-sage)"/> EV Strategy Portfolio
         </h3>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+        <div style={{ overflowX:"auto" }}>
+          <table style={{ width:"100%", borderCollapse:"collapse", textAlign:"left", fontSize:".84rem" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-subtle)", color: "var(--text-secondary)" }}>
-                <th style={{ padding: "0.75rem" }}>RANK</th>
-                <th style={{ padding: "0.75rem" }}>OPPORTUNITY</th>
-                <th style={{ padding: "0.75rem" }}>CATEGORY</th>
-                <th style={{ padding: "0.75rem" }}>AMOUNT</th>
-                <th style={{ padding: "0.75rem" }}>MATCH SCORE</th>
-                <th style={{ padding: "0.75rem" }}>EXPECTED VALUE</th>
-                <th style={{ padding: "0.75rem" }}>URGENCY</th>
-                <th style={{ padding: "0.75rem" }}>ACTION</th>
+              <tr style={{ borderBottom:"2px solid var(--border-subtle)" }}>
+                {["Rank","Opportunity","Category","Amount","Match","EV","Urgency","Action"].map(h => (
+                  <th key={h} style={{ padding:".7rem .75rem", color:"var(--text-muted)", fontWeight:700, fontSize:".7rem", textTransform:"uppercase", letterSpacing:".05em", whiteSpace:"nowrap" }}>{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {plan.recommended_strategy.map((item, idx) => (
-                <tr key={idx} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span className="badge badge-indigo">#{item.priority_rank}</span>
-                  </td>
-                  <td style={{ padding: "0.75rem", fontWeight: 600 }}>{item.title}</td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span className="badge" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-primary)" }}>
-                      {item.category}
-                    </span>
-                  </td>
-                  <td style={{ padding: "0.75rem", fontWeight: 700 }}>
-                    {formatAmt(item.amount_inr, item.amount_usd)}
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span className="badge badge-high">{item.match_score}% MATCH</span>
-                  </td>
-                  <td style={{ padding: "0.75rem", color: "var(--neon-emerald)", fontWeight: 700 }}>
-                    {formatAmt(item.expected_value_inr, item.expected_value_usd)}
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span className={`badge badge-${item.urgency.toLowerCase()}`}>{item.urgency}</span>
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <button 
-                      className="btn-primary" 
-                      style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem" }}
-                      onClick={() => onNavigate("autopilot")}
-                    >
-                      Autopilot Studio <Zap size={12} />
+                <tr key={idx} style={{ borderBottom:"1px solid var(--border-subtle)", transition:"background .15s" }}
+                  onMouseEnter={e => e.currentTarget.style.background="rgba(18,163,165,.04)"}
+                  onMouseLeave={e => e.currentTarget.style.background="transparent"}
+                >
+                  <td style={{ padding:".75rem" }}><span className="badge badge-indigo">#{item.priority_rank}</span></td>
+                  <td style={{ padding:".75rem", fontWeight:700, color:"var(--text-primary)", maxWidth:200 }}>{item.title}</td>
+                  <td style={{ padding:".75rem" }}><span className="badge badge-teal">{item.category}</span></td>
+                  <td style={{ padding:".75rem", fontWeight:700 }}>{fmt(item.amount_inr, item.amount_usd)}</td>
+                  <td style={{ padding:".75rem" }}><span className="badge badge-high">{item.match_score}%</span></td>
+                  <td style={{ padding:".75rem", color:"var(--accent-sage)", fontWeight:800 }}>{fmt(item.expected_value_inr, item.expected_value_usd)}</td>
+                  <td style={{ padding:".75rem" }}><span className={`badge ${urgencyColor(item.urgency)}`}>{item.urgency}</span></td>
+                  <td style={{ padding:".75rem" }}>
+                    <button className="btn-primary" style={{ padding:".35rem .75rem", fontSize:".75rem" }} onClick={() => onNavigate("autopilot")}>
+                      Autopilot <Zap size={12}/>
                     </button>
                   </td>
                 </tr>

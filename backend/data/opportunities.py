@@ -1,5 +1,6 @@
 """Verified funding catalogue: check official links before any application."""
 from typing import List, Optional
+from datetime import date
 from models import Opportunity
 from database import load_opportunities, save_opportunity
 
@@ -18,7 +19,16 @@ CURATED_OPPORTUNITIES: List[Opportunity] = [
 def get_all_opportunities() -> List[Opportunity]:
     for opportunity in CURATED_OPPORTUNITIES:
         save_opportunity(opportunity.model_dump())
-    return [Opportunity(**item) for item in load_opportunities()]
+    opportunities = []
+    for item in load_opportunities():
+        try:
+            remaining_days = (date.fromisoformat(item["deadline"]) - date.today()).days
+            item["days_left"] = remaining_days
+            item["urgency"] = "HIGH" if remaining_days <= 15 else ("MEDIUM" if remaining_days <= 45 else "LOW")
+        except (TypeError, ValueError):
+            pass
+        opportunities.append(Opportunity(**item))
+    return opportunities
 
 def get_opportunity_by_id(opp_id: str) -> Optional[Opportunity]:
     return next((opp for opp in get_all_opportunities() if opp.id == opp_id), None)

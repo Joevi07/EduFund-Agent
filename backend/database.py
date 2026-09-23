@@ -119,6 +119,18 @@ def bootstrap_admin() -> None:
     conn = get_db_connection(); count = conn.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'").fetchone()[0]; conn.close()
     if not count: create_user("EduFund Administrator", os.getenv("EDUFUND_ADMIN_EMAIL", "admin@edufund.local"), os.getenv("EDUFUND_ADMIN_PASSWORD", "Admin@123"), "admin")
 
+def save_student_profile(profile: Dict[str, Any]) -> Dict[str, Any]:
+    conn = get_db_connection()
+    conn.execute("""INSERT INTO student_profiles (id, name, education_level, course, profile_json)
+        VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,
+        education_level=excluded.education_level, course=excluded.course, profile_json=excluded.profile_json""",
+        (profile["id"], profile["name"], profile["education_level"], profile["course"], json.dumps(profile)))
+    conn.commit(); conn.close(); return profile
+
+def get_student_profile(user_id: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection(); row = conn.execute("SELECT profile_json FROM student_profiles WHERE id = ?", (user_id,)).fetchone(); conn.close()
+    return json.loads(row["profile_json"]) if row else None
+
 # Initialize DB on module import
 init_db()
 

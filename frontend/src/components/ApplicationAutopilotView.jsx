@@ -83,21 +83,23 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
-          <Sparkles size={22} color="var(--neon-indigo)" />
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>AI Application Autopilot Studio</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".3rem" }}>
+          <div style={{ background:"linear-gradient(135deg,var(--accent-teal),var(--teal-600))", borderRadius:9, padding:7, boxShadow:"0 3px 12px rgba(18,163,165,.3)", display:"flex" }}>
+            <Sparkles size={18} color="#fff"/>
+          </div>
+          <h2 style={{ fontSize: "1.55rem", fontWeight: 800, letterSpacing:"-.035em" }}>AI Application Autopilot Studio</h2>
         </div>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-          Extracts requirements, audits documents, refines essays with AI tone modifiers, and enforces human safety review controls.
+        <p style={{ color: "var(--text-secondary)", fontSize: ".88rem", marginLeft:"2.5rem" }}>
+          Extracts requirements, audits documents, refines essays with AI tone modifiers, and enforces human safety review.
         </p>
       </div>
 
       {/* Target Opportunity Header */}
-      <div className="bento-box" style={{ borderColor: "rgba(99, 102, 241, 0.4)", background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(15, 23, 42, 0.9))" }}>
-        <span className="badge badge-indigo">ACTIVE AUTOPILOT TARGET</span>
-        <h3 style={{ fontSize: "1.35rem", fontWeight: 800, marginTop: "0.4rem", marginBottom: "0.2rem" }}>{oppTitle}</h3>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-          Applicant: <strong>{profile.name}</strong> ({profile.course})
+      <div className="bento-box" style={{ background:"linear-gradient(145deg,rgba(14,122,124,.94),rgba(8,100,100,.97))", border:"1px solid rgba(255,255,255,.18)" }}>
+        <span className="badge" style={{ background:"rgba(255,255,255,.2)", color:"#fff", border:"1px solid rgba(255,255,255,.3)" }}>ACTIVE AUTOPILOT TARGET</span>
+        <h3 style={{ fontSize: "1.3rem", fontWeight: 800, marginTop: ".5rem", marginBottom: ".25rem", color:"#fff", letterSpacing:"-.03em" }}>{oppTitle}</h3>
+        <p style={{ color: "rgba(255,255,255,.78)", fontSize: ".85rem" }}>
+          Applicant: <strong style={{ color:"#fff" }}>{profile.name}</strong> · {profile.course}
         </p>
       </div>
 
@@ -116,9 +118,9 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {/* Missing Information Alert */}
             {autopilotData?.missing_information?.length > 0 && (
-              <div className="bento-box" style={{ borderColor: "rgba(245, 158, 11, 0.4)", background: "rgba(245, 158, 11, 0.05)" }}>
-                <h4 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--neon-amber)", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-                  <AlertOctagon size={16} /> Missing Profile Information Detected
+              <div className="bento-box" style={{ background:"rgba(217,119,6,.07)", border:"1px solid rgba(217,119,6,.22)" }}>
+                <h4 style={{ fontSize: ".92rem", fontWeight: 700, color: "var(--amber-500)", display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".6rem" }}>
+                  <AlertOctagon size={16}/> Missing Information Detected
                 </h4>
                 <ul style={{ paddingLeft: "1.2rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
                   {autopilotData.missing_information.map((item, idx) => (
@@ -200,14 +202,14 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
             {/* Human Safety Control */}
             <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1rem" }}>
               <div style={{
-                background: "rgba(16, 185, 129, 0.08)",
-                border: "1px solid rgba(16, 185, 129, 0.25)",
-                padding: "0.8rem 1rem",
+                background: "rgba(41,165,87,.08)",
+                border: "1px solid rgba(41,165,87,.22)",
+                padding: ".8rem 1rem",
                 borderRadius: "var(--radius-sm)",
-                marginBottom: "0.8rem"
+                marginBottom: ".8rem"
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 700, color: "var(--neon-emerald)", fontSize: "0.85rem", marginBottom: "0.3rem" }}>
-                  <ShieldCheck size={16} /> Human Review Safety Protocol
+                <div style={{ display: "flex", alignItems: "center", gap: ".5rem", fontWeight: 700, color: "var(--accent-sage)", fontSize: ".85rem", marginBottom: ".3rem" }}>
+                  <ShieldCheck size={16}/> Human Review Safety Protocol
                 </div>
                 <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
                   AI will never submit financial forms without explicit student review and authorization.

@@ -1,7 +1,13 @@
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+// In development, Vite proxies /api to FastAPI. Set VITE_API_URL when deployed.
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 async function authRequest(path, body) {
-  const res = await fetch(`${API_BASE_URL}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  let res;
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  } catch {
+    throw new Error("EduFund services are offline. Start the backend, then try again.");
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.detail || "Something went wrong. Please try again.");
   return data;
@@ -9,6 +15,8 @@ async function authRequest(path, body) {
 
 export const login = (email, password) => authRequest("/auth/login", { email, password });
 export const register = (name, email, password) => authRequest("/auth/register", { name, email, password });
+export async function fetchMyProfile(token) { const res = await fetch(`${API_BASE_URL}/profile/me`, { headers:{Authorization:`Bearer ${token}`} }); if (!res.ok) throw new Error("Unable to load your profile"); return res.json(); }
+export async function saveMyProfile(profile, token) { const res = await fetch(`${API_BASE_URL}/profile/me`, {method:"PUT", headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`}, body:JSON.stringify(profile)}); if (!res.ok) throw new Error("Unable to save your profile"); return res.json(); }
 export async function fetchAdminOverview(token) {
   const res = await fetch(`${API_BASE_URL}/admin/overview`, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error("Unable to load admin data"); return res.json();
@@ -58,8 +66,12 @@ export async function processProfile(profile) {
   }
 }
 
-export async function fetchOpportunities(category = "All", query = "") {
+export async function fetchOpportunities(category = "All", query = "", profile = null) {
   try {
+    if (profile) {
+      const res = await fetch(`${API_BASE_URL}/discovery`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({profile,category:category === "All" ? null : category,query:query || null})});
+      if (!res.ok) throw new Error("Error finding opportunities"); return await res.json();
+    }
     const params = new URLSearchParams();
     if (category && category !== "All") params.append("category", category);
     if (query) params.append("q", query);
