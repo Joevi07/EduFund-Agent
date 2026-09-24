@@ -587,6 +587,7 @@ input::placeholder, textarea::placeholder { color: #456b6b; opacity: 1; }
 .admin-stat { padding: 1.25rem; border-radius: var(--radius-sm); color: #fff; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-kpi); border: 1px solid rgba(255,255,255,.25); }
 .admin-stat span { display: block; font-size: .75rem; opacity: .88; font-weight: 600; }
 .admin-stat strong { display: block; font-size: 2rem; margin-top: .15rem; }
+.admin-stat small { display:block; margin-top:.3rem; font-size:.68rem; opacity:.9; font-weight:600; }
 .admin-stat.blue   { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
 .admin-stat.purple { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
 .admin-stat.orange { background: linear-gradient(135deg,#d97706,#b45309); }
@@ -604,6 +605,8 @@ input::placeholder, textarea::placeholder { color: #456b6b; opacity: 1; }
 .role-admin,.role-student { font-style: normal; text-transform: capitalize; padding: .25rem .55rem; border-radius: var(--radius-full); font-size: .7rem; font-weight: 700; }
 .role-admin   { background: rgba(139,92,246,.14); color: #5b21b6; }
 .role-student { background: rgba(18,163,165,.12); color: var(--teal-700); }
+.admin-shield { display:flex; align-items:center; gap:.45rem; color:var(--teal-700); background:rgba(18,163,165,.10); border:1px solid rgba(18,163,165,.2); border-radius:var(--radius-full); padding:.5rem .8rem; font-size:.76rem; font-weight:800; white-space:nowrap; }
+.admin-command-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }.admin-queue{display:grid;gap:.45rem}.queue-row{display:grid;grid-template-columns:20px 1fr auto;gap:.55rem;align-items:center;padding:.7rem;background:#fff8eb;border:1px solid #f6dbab;border-radius:9px;color:#9a5d09}.queue-row strong,.queue-row span{display:block}.queue-row strong{font-size:.81rem;color:#55380d}.queue-row span{font-size:.7rem;color:#8b6b35}.queue-row b{font-size:.72rem;white-space:nowrap}.queue-empty{display:flex;align-items:center;gap:.5rem;padding:1rem;color:#236844;background:#effaf3;border-radius:9px;font-size:.82rem}.readiness-metric{display:flex;align-items:baseline;gap:.45rem;margin:.5rem 0 1rem}.readiness-metric strong{font-size:2rem;color:var(--teal-700)}.readiness-metric span{font-size:.8rem;color:var(--text-secondary)}.stage-bars{display:grid;gap:.5rem}.stage-bars>div{display:grid;grid-template-columns:115px 1fr 20px;align-items:center;gap:.5rem;font-size:.68rem;color:var(--text-secondary);font-weight:700}.stage-bars>div>div{height:7px;border-radius:var(--radius-full);background:#e7f0f0;overflow:hidden}.stage-bars i{display:block;height:100%;min-width:2px;border-radius:inherit;background:var(--accent-teal)}.catalogue-table{display:grid}.catalogue-row{display:grid;grid-template-columns:1.6fr 1fr .65fr .75fr;gap:1rem;align-items:center;padding:.8rem .4rem;border-top:1px solid var(--border-subtle);font-size:.8rem;color:var(--text-secondary)}.catalogue-row strong,.catalogue-row small{display:block}.catalogue-row strong{color:var(--text-primary);font-size:.82rem}.catalogue-row small{font-size:.68rem;color:var(--text-muted);margin-top:.12rem}.catalogue-head{font-size:.67rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}.source-link{display:inline-flex;align-items:center;gap:.3rem;font-weight:800;font-size:.72rem;text-decoration:none;color:var(--teal-700)}.deadline-risk{color:#a23b2b;font-weight:800}
 
 /* ═══════════════════════════════════════════════════════════════
    USER GUIDE
@@ -650,6 +653,9 @@ input::placeholder, textarea::placeholder { color: #456b6b; opacity: 1; }
   .auth-panel { padding: 1.5rem; }
   .mobile-brand { display: flex; }
   .admin-stats { grid-template-columns: repeat(2,1fr); }
+  .admin-command-grid { grid-template-columns:1fr; }
+  .catalogue-row { grid-template-columns:1fr 1fr; }
+  .catalogue-row span:nth-child(2),.catalogue-head span:nth-child(2) { display:none; }
   .user-row { grid-template-columns: 1fr 1fr; }
   .user-row span:nth-child(4),.table-head span:nth-child(4) { display: none; }
   .guide-step { grid-template-columns: 28px 1fr; }

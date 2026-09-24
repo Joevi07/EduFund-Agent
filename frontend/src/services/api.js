@@ -25,6 +25,11 @@ export async function fetchAdminUsers(token) {
   const res = await fetch(`${API_BASE_URL}/admin/users`, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error("Unable to load users"); return res.json();
 }
+export async function fetchAdminCatalogue(token) {
+  const res = await fetch(`${API_BASE_URL}/admin/catalogue`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error("Unable to load opportunity catalogue");
+  return res.json();
+}
 
 export async function fetchHealth() {
   try {

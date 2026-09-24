@@ -115,6 +115,14 @@ def delete_session(token: str) -> None:
 def list_users() -> List[Dict[str, Any]]:
     conn = get_db_connection(); rows = conn.execute("SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC").fetchall(); conn.close(); return [dict(row) for row in rows]
 
+def platform_readiness() -> Dict[str, Any]:
+    """Privacy-preserving aggregate readiness metrics for administrators."""
+    conn = get_db_connection()
+    completed_profiles = conn.execute("SELECT COUNT(*) FROM student_profiles").fetchone()[0]
+    app_rows = conn.execute("SELECT status, COUNT(*) AS total FROM applications GROUP BY status").fetchall()
+    conn.close()
+    return {"completed_profiles": completed_profiles, "application_statuses": {row["status"]: row["total"] for row in app_rows}}
+
 def bootstrap_admin() -> None:
     conn = get_db_connection(); count = conn.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'").fetchone()[0]; conn.close()
     if not count: create_user("EduFund Administrator", os.getenv("EDUFUND_ADMIN_EMAIL", "admin@edufund.local"), os.getenv("EDUFUND_ADMIN_PASSWORD", "Admin@123"), "admin")

@@ -7,6 +7,7 @@ from models import (
     DraftRefineResponse,
     DocumentAuditRequest,
     DocumentAuditResponse
+    , DraftEvidenceRequest, DraftEvidenceResponse, EvidenceFinding
 )
 from data.opportunities import get_opportunity_by_id
 
@@ -160,3 +161,18 @@ class AutopilotAgent:
             missing_requirements=missing,
             audit_notes=notes
         )
+
+    def check_draft_evidence(self, req: DraftEvidenceRequest) -> DraftEvidenceResponse:
+        draft = req.draft_text.lower()
+        profile = req.student_profile
+        known_facts = [profile.course, str(profile.academic_profile.get("gpa", "")), *profile.achievements, *profile.interests]
+        findings = []
+        for fact in known_facts:
+            fact = str(fact).strip()
+            if fact and fact.lower() in draft:
+                findings.append(EvidenceFinding(claim=fact, status="SUPPORTED", detail="This claim is present in your saved profile."))
+        risk_phrases = ["national", "international", "published", "led", "founded", "awarded", "first", "best"]
+        for sentence in [s.strip() for s in req.draft_text.replace("\n", " ").split(".") if s.strip()]:
+            if any(word in sentence.lower() for word in risk_phrases) and not any(str(f).lower() in sentence.lower() for f in known_facts if str(f)):
+                findings.append(EvidenceFinding(claim=sentence[:140], status="REVIEW", detail="This may be a strong claim not directly supported by your saved profile. Add evidence or revise it."))
+        return DraftEvidenceResponse(supported_count=len([f for f in findings if f.status == "SUPPORTED"]), review_count=len([f for f in findings if f.status == "REVIEW"]), findings=findings)

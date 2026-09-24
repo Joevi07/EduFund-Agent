@@ -1,5 +1,5 @@
 from typing import List
-from models import StudentProfile, Opportunity, FundingPlan, StrategyItem, StrategySimulateRequest
+from models import StudentProfile, Opportunity, FundingPlan, StrategyItem, StrategySimulateRequest, FundingConfidence
 from agents.eligibility_agent import EligibilityAgent
 
 class PlannerAgent:
@@ -77,6 +77,18 @@ class PlannerAgent:
                 f"₹{remaining_gap_inr:,.0f}. Focus on top high-EV applications first."
             )
 
+        probable = sum(item["ev_inr"] for item in scored_items if item["match_score"] >= 80)
+        possible = sum(item["ev_inr"] for item in scored_items if 50 <= item["match_score"] < 80)
+        probable = round(min(funding_gap_inr, probable), 2)
+        possible = round(min(max(0, funding_gap_inr - probable), possible), 2)
+        remaining_risk = round(max(0, funding_gap_inr - probable - possible), 2)
+        confidence_score = round(min(100, ((confirmed_aid_inr + probable + possible) / max(1, target_cost_inr)) * 100))
+        confidence = FundingConfidence(
+            guaranteed_inr=confirmed_aid_inr, probable_inr=probable, possible_inr=possible,
+            remaining_risk_inr=remaining_risk, confidence_score=confidence_score,
+            explanation="Guaranteed funds are confirmed aid. Probable and possible values are expected-value estimates from profile eligibility, not promised awards."
+        )
+
         return FundingPlan(
             total_cost_inr=target_cost_inr,
             total_cost_usd=target_cost_usd,
@@ -90,7 +102,8 @@ class PlannerAgent:
             remaining_gap_usd=remaining_gap_usd,
             coverage_percentage=coverage_pct,
             recommended_strategy=strategy,
-            agent_advice=advice
+            agent_advice=advice,
+            confidence=confidence
         )
 
     def simulate_scenario(self, req: StrategySimulateRequest, opportunities: List[Opportunity]) -> FundingPlan:

@@ -18,7 +18,7 @@ from models import (
     DocumentAuditResponse,
     StrategySimulateRequest,
     ApplicationRecord,
-    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse, DiscoveryRequest
+    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse, DiscoveryRequest, DraftEvidenceRequest, DraftEvidenceResponse
 )
 from data.opportunities import get_all_opportunities, get_opportunity_by_id
 from agents.profile_agent import ProfileAgent
@@ -28,7 +28,7 @@ from agents.planner_agent import PlannerAgent
 from agents.autopilot_agent import AutopilotAgent
 from agents.deadline_agent import DeadlineAgent
 from database import (init_db, list_applications, upsert_application, save_opportunity, create_user,
-    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin, save_student_profile, get_student_profile)
+    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin, save_student_profile, get_student_profile, platform_readiness)
 
 # Initialize SQLite database on startup
 init_db()
@@ -93,8 +93,23 @@ def admin_list_users(authorization: Optional[str] = Header(None)):
 @app.get("/api/admin/overview")
 def admin_overview(authorization: Optional[str] = Header(None)):
     require_admin(authorization)
-    users = list_users()
-    return {"student_count": len([u for u in users if u["role"] == "student"]), "admin_count": len([u for u in users if u["role"] == "admin"]), "opportunity_count": len(get_all_opportunities()), "application_count": len(list_applications())}
+    users, opportunities, readiness = list_users(), get_all_opportunities(), platform_readiness()
+    deadline_review = deadline_agent.audit_deadlines(opportunities)
+    return {
+        "student_count": len([u for u in users if u["role"] == "student"]),
+        "admin_count": len([u for u in users if u["role"] == "admin"]),
+        "opportunity_count": len(opportunities),
+        "application_count": sum(readiness["application_statuses"].values()),
+        "completed_profiles": readiness["completed_profiles"],
+        "application_statuses": readiness["application_statuses"],
+        "source_linked_count": len([o for o in opportunities if o.website_url.startswith("https://")]),
+        "deadline_review": deadline_review,
+    }
+
+@app.get("/api/admin/catalogue", response_model=List[Opportunity])
+def admin_catalogue(authorization: Optional[str] = Header(None)):
+    require_admin(authorization)
+    return get_all_opportunities()
 
 @app.get("/")
 def read_root():
@@ -188,6 +203,10 @@ def refine_autopilot_draft(request: DraftRefineRequest):
 @app.post("/api/documents/audit", response_model=DocumentAuditResponse)
 def audit_documents(request: DocumentAuditRequest):
     return autopilot_agent.audit_documents(request)
+
+@app.post("/api/autopilot/evidence-check", response_model=DraftEvidenceResponse)
+def evidence_check(request: DraftEvidenceRequest):
+    return autopilot_agent.check_draft_evidence(request)
 
 @app.get("/api/deadlines")
 def get_deadlines():

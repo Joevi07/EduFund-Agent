@@ -79,6 +79,14 @@ class StrategyItem(BaseModel):
     priority_rank: int
     urgency: str
 
+class FundingConfidence(BaseModel):
+    guaranteed_inr: float
+    probable_inr: float
+    possible_inr: float
+    remaining_risk_inr: float
+    confidence_score: int
+    explanation: str
+
 class FundingPlan(BaseModel):
     total_cost_inr: float
     total_cost_usd: float
@@ -93,6 +101,7 @@ class FundingPlan(BaseModel):
     coverage_percentage: float
     recommended_strategy: List[StrategyItem]
     agent_advice: str
+    confidence: Optional[FundingConfidence] = None
 
 class AutopilotDraftRequest(BaseModel):
     opportunity_id: str
@@ -171,3 +180,17 @@ class DiscoveryRequest(BaseModel):
     profile: StudentProfile
     category: Optional[str] = None
     query: Optional[str] = None
+
+class DraftEvidenceRequest(BaseModel):
+    student_profile: StudentProfile
+    draft_text: str
+
+class EvidenceFinding(BaseModel):
+    claim: str
+    status: Literal["SUPPORTED", "REVIEW"]
+    detail: str
+
+class DraftEvidenceResponse(BaseModel):
+    supported_count: int
+    review_count: int
+    findings: List[EvidenceFinding]
