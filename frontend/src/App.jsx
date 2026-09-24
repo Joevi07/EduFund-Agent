@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import TopBar from "./components/TopBar";
-import HowItWorksDrawer from "./components/HowItWorksDrawer";
 import DashboardView from "./components/DashboardView";
 import ProfileBuilderView from "./components/ProfileBuilderView";
 import FundingPlannerView from "./components/FundingPlannerView";
 import DiscoveryMarketplaceView from "./components/DiscoveryMarketplaceView";
 import ApplicationAutopilotView from "./components/ApplicationAutopilotView";
 import PipelineTrackerView from "./components/PipelineTrackerView";
+import AuthView from "./components/AuthView";
+import AdminView from "./components/AdminView";
+import UserGuideView from "./components/UserGuideView";
 
 import { 
   fetchHealth, 
   processProfile, 
   fetchOpportunities, 
-  generateFundingPlan 
+  generateFundingPlan,
+  fetchApplications,
+  updateApplicationStatus,
+  fetchMyProfile,
+  saveMyProfile
 } from "./services/api";
 
 const INITIAL_PROFILE = {
@@ -46,14 +52,12 @@ const INITIAL_PROFILE = {
 };
 
 export default function App() {
+  const [auth, setAuth] = useState(() => { try { return JSON.parse(localStorage.getItem("edufund_auth")) || null; } catch { return null; } });
   const [activeTab, setActiveTab] = useState("dashboard");
   const [currency, setCurrency] = useState("INR");
   const [collapsed, setCollapsed] = useState(false);
   const [backendConnected, setBackendConnected] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Drawer state for "How It Works"
-  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
 
   const [profile, setProfile] = useState(INITIAL_PROFILE);
   const [opportunities, setOpportunities] = useState([]);
@@ -99,26 +103,37 @@ export default function App() {
   });
 
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
-  const [submittedIds, setSubmittedIds] = useState([]);
+  const [applications, setApplications] = useState([]);
 
   useEffect(() => {
     async function initData() {
       const health = await fetchHealth();
       setBackendConnected(health.status === "ok");
 
-      const opps = await fetchOpportunities();
+      let activeProfile = profile;
+      if (auth) {
+        const stored = await fetchMyProfile(auth.token).catch(() => null);
+        activeProfile = stored || { ...INITIAL_PROFILE, id: auth.user.id, name: auth.user.name, course: "", interests: [], achievements: [], academic_profile: { gpa: 0, max_gpa: 4, standardized_test: "", year_of_study: "" }, location: { country: "India", state: "", city: "", study_destination: "India" }, financial_constraints: { annual_family_income_inr: 0, target_annual_cost_inr: 0, confirmed_aid_inr: 0, currency: "INR" } };
+        setProfile(activeProfile);
+      }
+      const opps = await fetchOpportunities("All", "", activeProfile);
       setOpportunities(opps);
 
-      const planData = await generateFundingPlan(profile);
+      const planData = await generateFundingPlan(activeProfile);
       if (planData) setPlan(planData);
+
+      const applicationData = await fetchApplications();
+      setApplications(applicationData);
     }
     initData();
-  }, []);
+  }, [auth]);
 
   const handleSaveProfile = async (updatedProfile) => {
-    setProfile(updatedProfile);
-    const planData = await generateFundingPlan(updatedProfile);
+    const saved = await saveMyProfile(updatedProfile, auth.token).catch(() => updatedProfile);
+    setProfile(saved);
+    const [planData, opps] = await Promise.all([generateFundingPlan(saved), fetchOpportunities("All", "", saved)]);
     if (planData) setPlan(planData);
+    setOpportunities(opps);
   };
 
   const handleSelectAutopilot = (opp) => {
@@ -126,15 +141,19 @@ export default function App() {
     setActiveTab("autopilot");
   };
 
-  const handleMarkSubmitted = (oppId) => {
-    if (!submittedIds.includes(oppId)) {
-      setSubmittedIds(prev => [...prev, oppId]);
-    }
+  const handleApplicationStatus = async (oppId, status, draftText = null) => {
+    const record = await updateApplicationStatus(oppId, status, draftText);
+    setApplications(current => [...current.filter(item => item.opportunity_id !== oppId), record]);
   };
 
   const handleScenarioResult = (simPlan) => {
     if (simPlan) setPlan(simPlan);
   };
+
+  const handleAuthenticated = (data) => { localStorage.setItem("edufund_auth", JSON.stringify(data)); setAuth(data); };
+  const handleLogout = () => { localStorage.removeItem("edufund_auth"); setAuth(null); };
+
+  if (!auth) return <AuthView onAuthenticated={handleAuthenticated} />;
 
   return (
     <div className="app-layout">
@@ -143,9 +162,10 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         profile={profile}
+        user={auth.user}
+        onLogout={handleLogout}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
       />
 
       {/* Main App Content Area */}
@@ -154,12 +174,12 @@ export default function App() {
           currency={currency}
           setCurrency={setCurrency}
           backendConnected={backendConnected}
+          user={auth.user}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
         />
 
-        <main style={{ flex: 1, padding: "1.5rem 2rem", maxWidth: "1600px", width: "100%", margin: "0 auto" }}>
+        <main style={{ flex: 1, padding: "2rem", maxWidth: "1600px", width: "100%", margin: "0 auto" }}>
           {activeTab === "dashboard" && (
             <DashboardView 
               profile={profile}
@@ -167,6 +187,7 @@ export default function App() {
               currency={currency}
               onNavigate={setActiveTab}
               onScenarioResult={handleScenarioResult}
+              opportunitiesCount={opportunities.length}
             />
           )}
 
@@ -201,7 +222,7 @@ export default function App() {
               selectedOpportunity={selectedOpportunity || opportunities[0]}
               profile={profile}
               currency={currency}
-              onMarkSubmitted={handleMarkSubmitted}
+              onUpdateStatus={handleApplicationStatus}
             />
           )}
 
@@ -209,18 +230,15 @@ export default function App() {
             <PipelineTrackerView 
               opportunities={opportunities}
               currency={currency}
-              submittedIds={submittedIds}
+              applications={applications}
+              onUpdateStatus={handleApplicationStatus}
             />
           )}
+
+          {activeTab === "admin" && auth.user.role === "admin" && <AdminView token={auth.token} />}
+          {activeTab === "guide" && <UserGuideView onNavigate={setActiveTab} />}
         </main>
       </div>
-
-      {/* Slide-over How It Works Drawer */}
-      <HowItWorksDrawer 
-        isOpen={isHowItWorksOpen}
-        onClose={() => setIsHowItWorksOpen(false)}
-        onNavigate={setActiveTab}
-      />
     </div>
   );
 }

@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { 
   FileText, 
+  CheckSquare, 
   AlertOctagon, 
   Sparkles, 
   ShieldCheck, 
   Send, 
   RefreshCw, 
   CheckCircle,
-  Wand2
+  Wand2,
+  BookOpen,
+  Clock,
+  Layers,
+  Gauge,
+  GraduationCap,
+  Scissors
 } from "lucide-react";
 import { generateAutopilotDraft, refineAutopilotDraft } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
-import EssayEvidenceChecker from "./EssayEvidenceChecker";
 
-export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, onMarkSubmitted }) {
+export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, onUpdateStatus }) {
   const [loading, setLoading] = useState(false);
   const [refining, setRefining] = useState(false);
   const [autopilotData, setAutopilotData] = useState(null);
@@ -38,6 +44,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
         const words = (res.draft_response || "").split(" ").length;
         setWordCount(words);
         setReadingTime(Math.max(0.5, Math.round((words / 200) * 10) / 10));
+        onUpdateStatus?.(oppId, "DRAFTING", res.draft_response || "");
       } catch (err) {
         console.error("Autopilot error:", err);
       } finally {
@@ -70,38 +77,38 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
     setReadingTime(Math.max(0.5, Math.round((words / 200) * 10) / 10));
   };
 
-  const handleSafetySubmit = () => {
+  const handleSafetySubmit = async () => {
     if (!safetyApproved) return;
     setSubmissionComplete(true);
-    if (onMarkSubmitted) {
-      onMarkSubmitted(oppId);
-    }
+    await onUpdateStatus?.(oppId, "READY_TO_SUBMIT", editedDraft);
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
-          <Sparkles size={22} color="#4f46e5" />
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>AI Application Autopilot Studio</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".3rem" }}>
+          <div style={{ background:"linear-gradient(135deg,var(--accent-teal),var(--teal-600))", borderRadius:9, padding:7, boxShadow:"0 3px 12px rgba(18,163,165,.3)", display:"flex" }}>
+            <Sparkles size={18} color="#fff"/>
+          </div>
+          <h2 style={{ fontSize: "1.55rem", fontWeight: 800, letterSpacing:"-.035em" }}>AI Application Autopilot Studio</h2>
         </div>
-        <p style={{ color: "#64748b", fontSize: "0.9rem" }}>
-          Extracts requirements, audits documents, refines essays with AI tone modifiers, and verifies factual evidence.
+        <p style={{ color: "var(--text-secondary)", fontSize: ".88rem", marginLeft:"2.5rem" }}>
+          Extracts requirements, audits documents, refines essays with AI tone modifiers, and enforces human safety review.
         </p>
       </div>
 
       {/* Target Opportunity Header */}
-      <div className="bento-box" style={{ borderColor: "#c7d2fe", background: "linear-gradient(135deg, #ffffff, #f0f3ff)" }}>
-        <span className="badge badge-indigo">ACTIVE AUTOPILOT TARGET</span>
-        <h3 style={{ fontSize: "1.35rem", fontWeight: 800, marginTop: "0.4rem", marginBottom: "0.2rem", color: "#1e293b" }}>{oppTitle}</h3>
-        <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
-          Applicant: <strong>{profile.name}</strong> ({profile.course})
+      <div className="bento-box" style={{ background:"linear-gradient(145deg,rgba(14,122,124,.94),rgba(8,100,100,.97))", border:"1px solid rgba(255,255,255,.18)" }}>
+        <span className="badge" style={{ background:"rgba(255,255,255,.2)", color:"#fff", border:"1px solid rgba(255,255,255,.3)" }}>ACTIVE AUTOPILOT TARGET</span>
+        <h3 style={{ fontSize: "1.3rem", fontWeight: 800, marginTop: ".5rem", marginBottom: ".25rem", color:"#fff", letterSpacing:"-.03em" }}>{oppTitle}</h3>
+        <p style={{ color: "rgba(255,255,255,.78)", fontSize: ".85rem" }}>
+          Applicant: <strong style={{ color:"#fff" }}>{profile.name}</strong> · {profile.course}
         </p>
       </div>
 
       {loading ? (
-        <div className="bento-box" style={{ padding: "3rem", textAlign: "center", color: "#64748b" }}>
-          <RefreshCw size={32} className="pulse-dot" style={{ animation: "spin 1s linear infinite", marginBottom: "1rem" }} />
+        <div className="bento-box" style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>
+          <RefreshCw size={32} style={{ animation: "spin 1s linear infinite", marginBottom: "1rem", color:"var(--accent-teal)" }} />
           <div>Autopilot Agent is analyzing requirements and synthesizing response draft...</div>
         </div>
       ) : (
@@ -114,11 +121,11 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {/* Missing Information Alert */}
             {autopilotData?.missing_information?.length > 0 && (
-              <div className="bento-box" style={{ borderColor: "#fde68a", background: "#fffbeb" }}>
-                <h4 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#d97706", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-                  <AlertOctagon size={16} /> Missing Profile Information Detected
+              <div className="bento-box" style={{ background:"rgba(217,119,6,.07)", border:"1px solid rgba(217,119,6,.22)" }}>
+                <h4 style={{ fontSize: ".92rem", fontWeight: 700, color: "var(--amber-500)", display: "flex", alignItems: "center", gap: ".5rem", marginBottom: ".6rem" }}>
+                  <AlertOctagon size={16}/> Missing Information Detected
                 </h4>
-                <ul style={{ paddingLeft: "1.2rem", fontSize: "0.82rem", color: "#475569" }}>
+                <ul style={{ paddingLeft: "1.2rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
                   {autopilotData.missing_information.map((item, idx) => (
                     <li key={idx} style={{ marginBottom: "0.25rem" }}>{item}</li>
                   ))}
@@ -133,15 +140,6 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                 requiredDocuments={selectedOpportunity?.required_documents}
               />
             </div>
-
-            {/* 🌟 NEW FEATURE: AI Essay Evidence Checker Component */}
-            <div className="bento-box">
-              <EssayEvidenceChecker 
-                opportunityId={oppId}
-                essayDraft={editedDraft}
-                profile={profile}
-              />
-            </div>
           </div>
 
           {/* Right Column: AI Essay Studio & Refiner Toolbar */}
@@ -149,9 +147,9 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem", flexWrap: "wrap", gap: "0.5rem" }}>
                 <h4 style={{ fontSize: "1.05rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Wand2 size={18} color="#4f46e5" /> AI Essay Studio & Refiner
+                  <Wand2 size={18} color="var(--neon-indigo)" /> AI Essay Studio & Refiner
                 </h4>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", fontSize: "0.75rem", color: "#64748b" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
                   <span>Words: <strong>{wordCount}</strong></span>
                   <span>Est. Read: <strong>{readingTime}m</strong></span>
                   <span className="badge badge-indigo" style={{ fontSize: "0.62rem" }}>{appliedStyle}</span>
@@ -166,7 +164,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  ⚡ High Impact & Persuasive
+                  <Gauge size={14}/> High Impact & Persuasive
                 </button>
                 <button 
                   className="btn-secondary" 
@@ -174,7 +172,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  🎓 Academic Rigor
+                  <GraduationCap size={14}/> Academic Rigor
                 </button>
                 <button 
                   className="btn-secondary" 
@@ -182,11 +180,11 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  ✂️ Shorten (&lt;100w)
+                  <Scissors size={14}/> Shorten (&lt;100w)
                 </button>
               </div>
 
-              <div style={{ fontSize: "0.8rem", color: "#64748b", marginBottom: "0.5rem", fontStyle: "italic" }}>
+              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.5rem", fontStyle: "italic" }}>
                 Prompt: "{autopilotData?.prompt}"
               </div>
 
@@ -205,18 +203,18 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
             </div>
 
             {/* Human Safety Control */}
-            <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "1rem" }}>
+            <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "1rem" }}>
               <div style={{
-                background: "#ecfdf5",
-                border: "1px solid #a7f3d0",
-                padding: "0.8rem 1rem",
+                background: "rgba(41,165,87,.08)",
+                border: "1px solid rgba(41,165,87,.22)",
+                padding: ".8rem 1rem",
                 borderRadius: "var(--radius-sm)",
-                marginBottom: "0.8rem"
+                marginBottom: ".8rem"
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 700, color: "#059669", fontSize: "0.85rem", marginBottom: "0.3rem" }}>
-                  <ShieldCheck size={16} /> Human Review Safety Protocol
+                <div style={{ display: "flex", alignItems: "center", gap: ".5rem", fontWeight: 700, color: "var(--accent-sage)", fontSize: ".85rem", marginBottom: ".3rem" }}>
+                  <ShieldCheck size={16}/> Human Review Safety Protocol
                 </div>
-                <p style={{ fontSize: "0.78rem", color: "#475569" }}>
+                <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
                   AI will never submit financial forms without explicit student review and authorization.
                 </p>
 

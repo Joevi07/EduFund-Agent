@@ -1,12 +1,5 @@
 from typing import List
-from models import (
-    StudentProfile, 
-    Opportunity, 
-    FundingPlan, 
-    StrategyItem, 
-    StrategySimulateRequest,
-    ConfidenceMeterResponse
-)
+from models import StudentProfile, Opportunity, FundingPlan, StrategyItem, StrategySimulateRequest, FundingConfidence
 from agents.eligibility_agent import EligibilityAgent
 
 class PlannerAgent:
@@ -50,7 +43,9 @@ class PlannerAgent:
 
         for rank, item in enumerate(scored_items, 1):
             opp = item["opp"]
-            if item["match_score"] >= 50:
+            # A portfolio is assembled by expected value, never by nominal award
+            # value, so the remaining gap is a realistic planning estimate.
+            if item["match_score"] >= 50 and potential_coverage_inr < funding_gap_inr:
                 strategy.append(StrategyItem(
                     opportunity_id=opp.id,
                     title=opp.title,
@@ -63,8 +58,8 @@ class PlannerAgent:
                     priority_rank=rank,
                     urgency=opp.urgency
                 ))
-                potential_coverage_inr += opp.amount_inr
-                potential_coverage_usd += opp.amount_usd
+                potential_coverage_inr += item["ev_inr"]
+                potential_coverage_usd += item["ev_usd"]
 
         remaining_gap_inr = max(0.0, funding_gap_inr - potential_coverage_inr)
         remaining_gap_usd = max(0.0, funding_gap_usd - potential_coverage_usd)
@@ -82,6 +77,18 @@ class PlannerAgent:
                 f"₹{remaining_gap_inr:,.0f}. Focus on top high-EV applications first."
             )
 
+        probable = sum(item["ev_inr"] for item in scored_items if item["match_score"] >= 80)
+        possible = sum(item["ev_inr"] for item in scored_items if 50 <= item["match_score"] < 80)
+        probable = round(min(funding_gap_inr, probable), 2)
+        possible = round(min(max(0, funding_gap_inr - probable), possible), 2)
+        remaining_risk = round(max(0, funding_gap_inr - probable - possible), 2)
+        confidence_score = round(min(100, ((confirmed_aid_inr + probable + possible) / max(1, target_cost_inr)) * 100))
+        confidence = FundingConfidence(
+            guaranteed_inr=confirmed_aid_inr, probable_inr=probable, possible_inr=possible,
+            remaining_risk_inr=remaining_risk, confidence_score=confidence_score,
+            explanation="Guaranteed funds are confirmed aid. Probable and possible values are expected-value estimates from profile eligibility, not promised awards."
+        )
+
         return FundingPlan(
             total_cost_inr=target_cost_inr,
             total_cost_usd=target_cost_usd,
@@ -95,13 +102,16 @@ class PlannerAgent:
             remaining_gap_usd=remaining_gap_usd,
             coverage_percentage=coverage_pct,
             recommended_strategy=strategy,
-            agent_advice=advice
+            agent_advice=advice,
+            confidence=confidence
         )
 
     def simulate_scenario(self, req: StrategySimulateRequest, opportunities: List[Opportunity]) -> FundingPlan:
+        # Clone profile and apply scenario parameter overrides
         prof = req.profile.model_copy(deep=True)
         fin = prof.financial_constraints
 
+        # Extra aid & work-study additions
         original_aid = fin.get("confirmed_aid_inr", 60000.0)
         new_aid = original_aid + req.increased_family_aid_inr + req.extra_work_study_inr
         fin["confirmed_aid_inr"] = new_aid
@@ -112,53 +122,3 @@ class PlannerAgent:
             f"Target coverage target: {req.desired_coverage_target_pct}%."
         )
         return plan
-
-    # 🌟 NEW FEATURE 1: Funding Confidence Meter Algorithm
-    def calculate_funding_confidence(self, profile: StudentProfile, plan: FundingPlan) -> ConfidenceMeterResponse:
-        coverage_ratio = plan.coverage_percentage / 100.0
-
-        # Average match score across recommended items
-        if plan.recommended_strategy:
-            avg_match = sum(item.match_score for item in plan.recommended_strategy) / len(plan.recommended_strategy)
-        else:
-            avg_match = 50.0
-
-        doc_readiness = 85.0  # Normalized profile readiness
-        deadline_buffer = 90.0
-
-        score = round(
-            (0.45 * (coverage_ratio * 100.0)) +
-            (0.30 * avg_match) +
-            (0.15 * doc_readiness) +
-            (0.10 * deadline_buffer)
-        )
-        score = max(0, min(100, score))
-
-        if score >= 80:
-            rating = "HIGH_CONFIDENCE"
-        elif score >= 55:
-            rating = "MODERATE_CONFIDENCE"
-        else:
-            rating = "LOW_CONFIDENCE"
-
-        drivers = [
-            f"Strategy portfolio provides {plan.coverage_percentage:.0f}% potential gap coverage",
-            f"Strong average academic/financial match score ({avg_match:.0f}%)",
-            "High document verification readiness across primary scholarships"
-        ]
-
-        risks = []
-        if plan.remaining_gap_inr > 0:
-            risks.append(f"Uncovered remaining gap of ₹{plan.remaining_gap_inr:,.0f}")
-        if any(item.urgency == "HIGH" for item in plan.recommended_strategy):
-            risks.append("Urgent deadlines closing within 15 days require immediate submission")
-
-        return ConfidenceMeterResponse(
-            overall_confidence_score=score,
-            rating=rating,
-            gap_coverage_ratio=coverage_ratio,
-            document_readiness_pct=doc_readiness,
-            deadline_buffer_score=deadline_buffer,
-            key_drivers=drivers,
-            risk_factors=risks
-        )

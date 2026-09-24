@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Literal
 
 class StudentProfile(BaseModel):
     id: str = "std_001"
@@ -79,6 +79,14 @@ class StrategyItem(BaseModel):
     priority_rank: int
     urgency: str
 
+class FundingConfidence(BaseModel):
+    guaranteed_inr: float
+    probable_inr: float
+    possible_inr: float
+    remaining_risk_inr: float
+    confidence_score: int
+    explanation: str
+
 class FundingPlan(BaseModel):
     total_cost_inr: float
     total_cost_usd: float
@@ -93,6 +101,7 @@ class FundingPlan(BaseModel):
     coverage_percentage: float
     recommended_strategy: List[StrategyItem]
     agent_advice: str
+    confidence: Optional[FundingConfidence] = None
 
 class AutopilotDraftRequest(BaseModel):
     opportunity_id: str
@@ -111,7 +120,7 @@ class AutopilotDraftResponse(BaseModel):
 class DraftRefineRequest(BaseModel):
     opportunity_id: str
     current_draft: str
-    instruction: str
+    instruction: str  # e.g. "persuasive", "academic", "shorten", "technical"
 
 class DraftRefineResponse(BaseModel):
     refined_draft: str
@@ -121,10 +130,10 @@ class DraftRefineResponse(BaseModel):
 
 class DocumentAuditRequest(BaseModel):
     opportunity_id: str
-    uploaded_files: List[str]
+    uploaded_files: List[str]  # e.g. ["marksheet.pdf", "income_certificate.pdf"]
 
 class DocumentAuditResponse(BaseModel):
-    verification_status: str
+    verification_status: str  # PASSED, PENDING, FAILED
     verified_files: List[Dict[str, Any]]
     missing_requirements: List[str]
     audit_notes: str
@@ -135,52 +144,53 @@ class StrategySimulateRequest(BaseModel):
     extra_work_study_inr: float = 0.0
     increased_family_aid_inr: float = 0.0
 
-# 🌟 NEW FEATURE 1: Funding Confidence Meter
-class ConfidenceMeterResponse(BaseModel):
-    overall_confidence_score: int  # 0 to 100%
-    rating: str  # HIGH_CONFIDENCE, MODERATE_CONFIDENCE, LOW_CONFIDENCE
-    gap_coverage_ratio: float
-    document_readiness_pct: float
-    deadline_buffer_score: float
-    key_drivers: List[str]
-    risk_factors: List[str]
-
-# 🌟 NEW FEATURE 2: Document Reuse Map + Deadline Collision Detector
-class DocumentReuseItem(BaseModel):
-    document_name: str
-    required_by_opportunities: List[str]
-    reuse_count: int
-    effort_saved_hours: float
-
-class DeadlineCollision(BaseModel):
-    date: str
-    colliding_opportunity_ids: List[str]
-    colliding_titles: List[str]
-    window_days: int
-    risk_level: str  # HIGH_COLLISION, MODERATE_COLLISION
-
-class DocumentReuseResponse(BaseModel):
-    reusable_documents: List[DocumentReuseItem]
-    total_repetition_saved_pct: float
-    deadline_collisions: List[DeadlineCollision]
-    collision_alerts: List[str]
-    suggested_timeline: List[Dict[str, Any]]
-
-# 🌟 NEW FEATURE 3: AI Essay Evidence Checker
-class EssayClaimVerification(BaseModel):
-    claim_text: str
-    verification_status: str  # VALIDATED, UNVERIFIED_PROFILE, UNMATCHED_CRITERIA
-    evidence_source: Optional[str] = None
-    feedback_note: str
-
-class EssayEvidenceCheckRequest(BaseModel):
+class ApplicationRecord(BaseModel):
     opportunity_id: str
-    essay_draft: str
-    student_profile: StudentProfile
+    status: Literal["DISCOVERED", "PLANNED", "DRAFTING", "READY_TO_SUBMIT", "SUBMITTED"] = "DISCOVERED"
+    draft_text: Optional[str] = None
+    notes: Optional[str] = None
+    updated_at: Optional[str] = None
 
-class EssayEvidenceCheckResponse(BaseModel):
-    overall_validity_score: int  # 0 to 100%
-    verified_claims_count: int
-    unverified_claims_count: int
-    claim_verifications: List[EssayClaimVerification]
-    improvement_suggestions: List[str]
+class ApplicationStatusUpdate(BaseModel):
+    status: Literal["DISCOVERED", "PLANNED", "DRAFTING", "READY_TO_SUBMIT", "SUBMITTED"]
+    draft_text: Optional[str] = None
+    notes: Optional[str] = None
+
+class RegisterRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    email: str
+    password: str = Field(min_length=8, max_length=128)
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class UserPublic(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: Literal["student", "admin"]
+    created_at: Optional[str] = None
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserPublic
+
+class DiscoveryRequest(BaseModel):
+    profile: StudentProfile
+    category: Optional[str] = None
+    query: Optional[str] = None
+
+class DraftEvidenceRequest(BaseModel):
+    student_profile: StudentProfile
+    draft_text: str
+
+class EvidenceFinding(BaseModel):
+    claim: str
+    status: Literal["SUPPORTED", "REVIEW"]
+    detail: str
+
+class DraftEvidenceResponse(BaseModel):
+    supported_count: int
+    review_count: int
+    findings: List[EvidenceFinding]
