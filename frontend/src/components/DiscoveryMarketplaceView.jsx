@@ -139,9 +139,9 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
             <h4 style={{ fontSize:".88rem", fontWeight:700, marginBottom:".65rem", color:"var(--text-secondary)", textTransform:"uppercase", letterSpacing:".06em" }}>Eligibility Checks</h4>
             <div style={{ display:"flex", flexDirection:"column", gap:".55rem", marginBottom:"1.5rem" }}>
               {[
-                { label:"Degree Level", detail:`${selectedOpp.degree_levels?.join(", ")} — matched ✓` },
-                { label:"Min GPA",      detail:`${selectedOpp.min_gpa || "No requirement"} — met ✓` },
-                { label:"Income Limit", detail:`₹${selectedOpp.max_family_income_inr?.toLocaleString() || "—"} — eligible ✓` },
+                { label:"Degree Level", detail:`${selectedOpp.degree_levels?.join(", ")} — profile checked` },
+                { label:"Min GPA",      detail:`${selectedOpp.min_gpa || "No requirement"} — profile checked` },
+                { label:"Income Limit", detail:`₹${selectedOpp.max_family_income_inr?.toLocaleString() || "Not specified"} — profile checked` },
               ].map(({ label, detail }) => (
                 <div key={label} style={{ padding:".65rem .9rem", background:"rgba(41,165,87,.07)", border:"1px solid rgba(41,165,87,.18)", borderRadius:10, display:"flex", gap:".65rem", fontSize:".84rem", alignItems:"flex-start" }}>
                   <CheckCircle2 size={17} color="var(--accent-sage)" style={{ flexShrink:0, marginTop:1 }}/>

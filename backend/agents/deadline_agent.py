@@ -41,9 +41,9 @@ class DeadlineAgent:
 
         alerts = []
         if urgent:
-            alerts.append(f"⚠️ URGENT: {len(urgent)} funding opportunity deadlines closing within 15 days!")
+            alerts.append(f"URGENT: {len(urgent)} funding opportunity deadlines close within 15 days.")
         if upcoming:
-            alerts.append(f"📅 UPCOMING: {len(upcoming)} opportunities due within 45 days.")
+            alerts.append(f"UPCOMING: {len(upcoming)} opportunities are due within 45 days.")
 
         return {
             "urgent_count": len(urgent),

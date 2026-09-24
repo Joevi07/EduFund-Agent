@@ -11,7 +11,10 @@ import {
   Wand2,
   BookOpen,
   Clock,
-  Layers
+  Layers,
+  Gauge,
+  GraduationCap,
+  Scissors
 } from "lucide-react";
 import { generateAutopilotDraft, refineAutopilotDraft } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
@@ -105,7 +108,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
 
       {loading ? (
         <div className="bento-box" style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>
-          <RefreshCw size={32} className="pulse-dot" style={{ animation: "spin 1s linear infinite", marginBottom: "1rem" }} />
+          <RefreshCw size={32} style={{ animation: "spin 1s linear infinite", marginBottom: "1rem", color:"var(--accent-teal)" }} />
           <div>Autopilot Agent is analyzing requirements and synthesizing response draft...</div>
         </div>
       ) : (
@@ -161,7 +164,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  ⚡ High Impact & Persuasive
+                  <Gauge size={14}/> High Impact & Persuasive
                 </button>
                 <button 
                   className="btn-secondary" 
@@ -169,7 +172,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  🎓 Academic Rigor
+                  <GraduationCap size={14}/> Academic Rigor
                 </button>
                 <button 
                   className="btn-secondary" 
@@ -177,7 +180,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   disabled={refining}
                   style={{ fontSize: "0.75rem", padding: "0.3rem 0.65rem", borderRadius: "4px" }}
                 >
-                  ✂️ Shorten (&lt;100w)
+                  <Scissors size={14}/> Shorten (&lt;100w)
                 </button>
               </div>
 

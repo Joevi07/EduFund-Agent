@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, IndianRupee, DollarSign, Bell, Mail, Wifi, WifiOff } from "lucide-react";
+import { Search, IndianRupee, DollarSign } from "lucide-react";
 
 export default function TopBar({ currency, setCurrency, backendConnected, searchQuery, setSearchQuery, user }) {
   const initials = (user?.name || "S").split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
@@ -35,51 +35,6 @@ export default function TopBar({ currency, setCurrency, backendConnected, search
 
       {/* ── RIGHT: Controls ── */}
       <div style={{ display:"flex", alignItems:"center", gap:"1rem", flexShrink:0 }}>
-
-        {/* Backend status pill */}
-        <div style={{
-          display:"flex", alignItems:"center", gap:".35rem",
-          background: backendConnected ? "rgba(41,165,87,.1)" : "rgba(224,80,64,.1)",
-          border: `1px solid ${backendConnected ? "rgba(41,165,87,.25)" : "rgba(224,80,64,.25)"}`,
-          borderRadius: 20,
-          padding: ".28rem .7rem",
-          fontSize: ".68rem", fontWeight: 700,
-          color: backendConnected ? "#166534" : "#991b1b",
-          letterSpacing: ".04em",
-          textTransform: "uppercase",
-        }}>
-          {backendConnected
-            ? <><Wifi size={11}/> Live</>
-            : <><WifiOff size={11}/> Offline</>
-          }
-        </div>
-
-        {/* Notification icons */}
-        <div style={{ display:"flex", alignItems:"center", gap:".75rem" }}>
-          {[
-            { Icon: Bell,  count: 3,  color: "var(--accent-teal)"  },
-            { Icon: Mail,  count: 7,  color: "var(--amber-400)"    },
-          ].map(({ Icon, count, color }, i) => (
-            <div key={i} style={{ position:"relative", cursor:"pointer", padding:6,
-              background:"rgba(255,255,255,.6)", borderRadius:9,
-              border:"1px solid rgba(18,163,165,.14)",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              transition:"background .18s", backdropFilter:"blur(8px)" }}
-              onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,.9)"}
-              onMouseLeave={e => e.currentTarget.style.background="rgba(255,255,255,.6)"}
-            >
-              <Icon size={16} color="var(--text-secondary)" />
-              <span style={{
-                position:"absolute", top:-5, right:-5,
-                background: color, color:"#fff",
-                fontSize:".6rem", fontWeight:800,
-                width:16, height:16, borderRadius:"50%",
-                display:"flex", alignItems:"center", justifyContent:"center",
-                border:"2px solid rgba(255,255,255,.9)",
-              }}>{count}</span>
-            </div>
-          ))}
-        </div>
 
         {/* Currency switcher */}
         <div style={{

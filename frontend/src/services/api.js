@@ -242,7 +242,7 @@ export async function fetchDeadlines() {
       urgent_count: 2,
       upcoming_count: 3,
       normal_count: 3,
-      alerts: ["⚠️ URGENT: 2 funding opportunity deadlines closing within 15 days!"]
+      alerts: ["URGENT: 2 funding opportunity deadlines close within 15 days."]
     };
   }
 }

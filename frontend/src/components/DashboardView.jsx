@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  TrendingUp, ShieldCheck, ArrowRight, Zap, Target,
-  Layers, AlertTriangle, Compass, FileText, Award, Kanban
-} from "lucide-react";
+import { TrendingUp, ShieldCheck, ArrowRight, Zap, Target, Layers, AlertTriangle, Compass, FileText, Kanban, UserCheck, SearchCheck, CircleCheckBig, Calculator } from "lucide-react";
 import AgentNodeGraph from "./AgentNodeGraph";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 
@@ -28,19 +25,19 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
 
   // Personalised log entries derived from real profile/plan data
   const logs = useMemo(() => [
-    { type: "Profile",     text: `🤖 Profile Agent initialized for ${name} (${course})` },
-    { type: "Discovery",   text: `🔍 Opportunity Discovery Agent queried ${opportunitiesCount || "several"} curated funding sources` },
-    { type: "Eligibility", text: `⚡ Eligibility Agent evaluated ${stratCount} candidates based on GPA ${gpa}/${maxGpa}` },
-    { type: "Planner",     text: `💰 Funding Planner computed gap: ${fmt(plan?.funding_gap_inr || 0, plan?.funding_gap_usd || 0)}` },
-    { type: "Planner",     text: `🎯 Strategy stack assembled: ${covPct}% gap coverage potential` },
-    { type: "Autopilot",   text: `📝 Autopilot Agent ready to draft essays for ${stratCount} matched opportunities` },
+    { type: "Profile", Icon:UserCheck, text: `Profile is ready for ${name} (${course})` },
+    { type: "Discovery", Icon:SearchCheck, text: `Discovery checked ${opportunitiesCount || "available"} verified funding sources` },
+    { type: "Eligibility", Icon:CircleCheckBig, text: `Eligibility evaluated ${stratCount} candidates using GPA ${gpa}/${maxGpa}` },
+    { type: "Planner", Icon:Calculator, text: `Funding Planner calculated a gap of ${fmt(plan?.funding_gap_inr || 0, plan?.funding_gap_usd || 0)}` },
+    { type: "Planner", Icon:Target, text: `Strategy portfolio has ${covPct}% coverage potential` },
+    { type: "Autopilot", Icon:FileText, text: `Autopilot is ready to prepare ${stratCount} application drafts` },
   ], [name, course, opportunitiesCount, stratCount, gpa, maxGpa, covPct]);
 
   const filteredLogs = logFilter === "All" ? logs : logs.filter(l => l.type === logFilter);
   const LOG_TYPES    = ["All", "Profile", "Discovery", "Eligibility", "Planner", "Autopilot"];
 
   const alertText = covPct >= 100
-    ? `Agentic loop evaluated ${stratCount} opportunities — 100% funding gap coverage strategy assembled! 🎉`
+    ? `Your current strategy covers the full funding gap based on expected-value estimates.`
     : `Agentic loop found ${stratCount} opportunities covering ${covPct}% of your funding gap.`;
 
   // Block card data using real counts
@@ -58,7 +55,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
         <div>
           <h2 style={{ fontSize:"1.55rem", fontWeight:800, letterSpacing:"-.03em", color:"var(--text-primary)" }}>
-            Welcome back, {name.split(" ")[0]} 👋
+            Welcome back, {name.split(" ")[0]}
           </h2>
           <p style={{ fontSize:".88rem", color:"var(--text-secondary)", marginTop:".2rem" }}>
             {year && `${year} · `}{course}{city ? ` · ${city}` : ""}
@@ -74,7 +71,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
       {showAlert && (
         <div className="alert-success-box">
           <div style={{ display:"flex", alignItems:"center", gap:".6rem" }}>
-            <span className="badge badge-success" style={{ fontSize:".65rem" }}>Live</span>
+            <CircleCheckBig size={18} color="var(--accent-sage)" aria-hidden="true" />
             <span style={{ fontSize:".87rem" }}>{alertText}</span>
           </div>
           <button onClick={() => setShowAlert(false)}
@@ -211,7 +208,9 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
           </div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:".5rem" }}>
-          {filteredLogs.map((log, i) => (
+          {filteredLogs.map((log, i) => {
+            const LogIcon = log.Icon;
+            return (
             <div key={i} style={{
               display:"flex", alignItems:"flex-start", gap:".75rem",
               padding:".7rem 1rem",
@@ -227,9 +226,9 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
                 letterSpacing:".04em", textTransform:"uppercase",
                 border:"1px solid rgba(18,163,165,.2)",
               }}>{log.type}</span>
-              {log.text}
+              <LogIcon size={16} color="var(--accent-teal)" style={{ flexShrink:0, marginTop:2 }}/>{log.text}
             </div>
-          ))}
+          )})}
         </div>
       </div>
 

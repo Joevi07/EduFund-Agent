@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, TrendingUp, Zap, ArrowRight } from "lucide-react";
+import { Target, TrendingUp, Zap, Calculator, Bot } from "lucide-react";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 
 export default function FundingPlannerView({ plan, profile, currency, onNavigate, onScenarioResult }) {
@@ -35,7 +35,7 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
         {/* Funding equation card */}
         <div className="bento-box" style={{ background:"linear-gradient(145deg,rgba(14,122,124,.94),rgba(8,100,100,.97))", border:"1px solid rgba(255,255,255,.18)" }}>
           <h3 style={{ fontSize:"1.05rem", fontWeight:700, color:"#fff", marginBottom:"1.1rem", display:"flex", alignItems:"center", gap:".45rem" }}>
-            📐 Funding Equation
+            <Calculator size={18}/> Funding Equation
           </h3>
           <div style={{ display:"flex", flexDirection:"column", gap:".75rem" }}>
             {equations.map(({ label, val, color, bg, border }) => (
@@ -52,7 +52,7 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
             ))}
           </div>
           <div style={{ marginTop:"1rem", padding:".8rem 1rem", background:"rgba(255,255,255,.08)", backdropFilter:"blur(8px)", borderRadius:10, border:"1px solid rgba(255,255,255,.15)", fontSize:".82rem", color:"rgba(255,255,255,.85)", lineHeight:1.5 }}>
-            🤖 <strong style={{ color:"#fff" }}>Planner Agent:</strong> {plan.agent_advice}
+            <Bot size={16} style={{ verticalAlign:"middle", marginRight:".35rem" }}/><strong style={{ color:"#fff" }}>Planner Agent:</strong> {plan.agent_advice}
           </div>
         </div>
 

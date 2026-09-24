@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, DollarSign, Save, MapPin, Award } from "lucide-react";
+import { User, DollarSign, Save, MapPin, Award, CheckCircle2 } from "lucide-react";
 
 const Section = ({ icon: Icon, title, color = "var(--accent-teal)", children }) => (
   <div className="bento-box" style={{ padding:"1.8rem" }}>
@@ -130,7 +130,7 @@ export default function ProfileBuilderView({ profile, setProfile, onSaveProfile 
           </button>
           {saved && (
             <span style={{ color:"var(--accent-sage)", fontSize:".88rem", fontWeight:700 }}>
-              ✓ Saved! Strategy recalculated.
+              <CheckCircle2 size={16} style={{ verticalAlign:"middle", marginRight:".3rem" }}/>Saved! Strategy recalculated.
             </span>
           )}
         </div>

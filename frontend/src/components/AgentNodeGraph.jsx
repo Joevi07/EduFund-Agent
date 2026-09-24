@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserCheck, Compass, CheckCircle2, Target, FileText, Kanban, ArrowRight } from "lucide-react";
+import { UserCheck, Compass, CheckCircle2, Target, FileText, Kanban, Zap } from "lucide-react";
 
 export default function AgentNodeGraph({ onSelectAgentNode }) {
   const [activeNode, setActiveNode] = useState("planner");
@@ -17,7 +17,7 @@ export default function AgentNodeGraph({ onSelectAgentNode }) {
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h3 style={{ fontSize: "1.05rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          ⚡ Multi-Agent Execution Flow Architecture
+          <Zap size={18} color="var(--accent-teal)" /> Multi-Agent Execution Flow
         </h3>
         <span className="badge badge-indigo" style={{ fontSize: "0.65rem" }}>6 ACTIVE AGENTS</span>
       </div>
@@ -40,21 +40,21 @@ export default function AgentNodeGraph({ onSelectAgentNode }) {
                 if (onSelectAgentNode) onSelectAgentNode(node.id);
               }}
               style={{
-                borderColor: isSelected ? "var(--neon-indigo)" : "var(--border-subtle)",
-                background: isSelected ? "rgba(99, 102, 241, 0.15)" : "rgba(15, 23, 42, 0.8)"
+                borderColor: isSelected ? "var(--accent-teal)" : "var(--border-subtle)",
+                background: isSelected ? "rgba(18, 163, 165, .10)" : "rgba(255,255,255,.72)"
               }}
             >
               <div style={{
                 width: "32px",
                 height: "32px",
                 borderRadius: "8px",
-                background: isSelected ? "var(--neon-indigo)" : "rgba(255,255,255,0.05)",
+                background: isSelected ? "var(--accent-teal)" : "rgba(18,163,165,.10)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0
               }}>
-                <Icon size={16} color={isSelected ? "#ffffff" : "var(--neon-indigo)"} />
+                <Icon size={16} color={isSelected ? "#ffffff" : "var(--accent-teal)"} />
               </div>
               <div>
                 <div style={{ fontSize: "0.8rem", fontWeight: 700 }}>{node.title}</div>
