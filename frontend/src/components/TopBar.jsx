@@ -1,7 +1,7 @@
 import React from "react";
 import { Search, IndianRupee, DollarSign, Bell, Mail, HelpCircle, Menu } from "lucide-react";
 
-export default function TopBar({ currency, setCurrency, backendConnected, searchQuery, setSearchQuery, onOpenHowItWorks }) {
+export default function TopBar({ currency, setCurrency, backendConnected, searchQuery, setSearchQuery, onOpenHowItWorks, user, onLogout }) {
   return (
     <header style={{
       height: "65px",
@@ -152,23 +152,44 @@ export default function TopBar({ currency, setCurrency, backendConnected, search
           </button>
         </div>
 
-        {/* User Profile Avatar */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
-          <div style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "50%",
-            background: "#20a8d8",
-            color: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: 700,
-            fontSize: "0.8rem"
-          }}>
-            AS
+        {/* User Profile Avatar & Logout */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <div style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #06B6D4, #3B82F6)",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 700,
+              fontSize: "0.8rem"
+            }}>
+              {user?.name ? user.name.split(" ").map(n => n[0]).join("") : "AS"}
+            </div>
+            <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#272c33" }}>
+              {user?.name || "Aarav Sharma"}
+            </span>
           </div>
-          <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#272c33" }}>Aarav Sharma</span>
+
+          <button
+            onClick={onLogout}
+            style={{
+              background: "#fff0f0",
+              border: "1px solid #ffcdd2",
+              color: "#e53935",
+              padding: "0.3rem 0.65rem",
+              borderRadius: "6px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              marginLeft: "0.25rem"
+            }}
+          >
+            Log Out
+          </button>
         </div>
       </div>
     </header>

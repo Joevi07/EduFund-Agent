@@ -7,7 +7,7 @@ import ProfileBuilderView from "./components/ProfileBuilderView";
 import FundingPlannerView from "./components/FundingPlannerView";
 import DiscoveryMarketplaceView from "./components/DiscoveryMarketplaceView";
 import ApplicationAutopilotView from "./components/ApplicationAutopilotView";
-import PipelineTrackerView from "./components/PipelineTrackerView";
+import AuthView from "./components/AuthView";
 
 import { 
   fetchHealth, 
@@ -45,7 +45,38 @@ const INITIAL_PROFILE = {
   ]
 };
 
+const MAYA_PROFILE = {
+  id: "std_002",
+  name: "Maya Patel",
+  education_level: "Postgraduate",
+  course: "Biomedical Engineering & Pre-Med",
+  academic_profile: {
+    gpa: 3.95,
+    max_gpa: 4.0,
+    standardized_test: "MCAT 518 / GRE 330",
+    year_of_study: "1st Year Masters"
+  },
+  location: {
+    country: "United States",
+    state: "California",
+    city: "Stanford"
+  },
+  interests: ["Biomedical Research", "Genomics", "Healthcare Innovation"],
+  financial_constraints: {
+    annual_family_income_inr: 850000,
+    target_annual_cost_inr: 250000,
+    confirmed_aid_inr: 100000,
+    currency: "USD"
+  },
+  achievements: [
+    "Gates Millennium Scholar Nominee",
+    "Co-authored 2 Cell Biology papers"
+  ]
+};
+
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [currency, setCurrency] = useState("INR");
   const [collapsed, setCollapsed] = useState(false);
@@ -136,6 +167,27 @@ export default function App() {
     if (simPlan) setPlan(simPlan);
   };
 
+  const handleAuthenticated = (authData) => {
+    setCurrentUser(authData.user);
+    if (authData.profilePreset === "maya") {
+      setProfile(MAYA_PROFILE);
+      setCurrency("USD");
+    } else {
+      setProfile(INITIAL_PROFILE);
+      setCurrency("INR");
+    }
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+  };
+
+  if (!isAuthenticated) {
+    return <AuthView onAuthenticated={handleAuthenticated} />;
+  }
+
   return (
     <div className="app-layout">
       {/* Collapsible Left Sidebar */}
@@ -157,6 +209,8 @@ export default function App() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
+          user={currentUser}
+          onLogout={handleLogout}
         />
 
         <main style={{ flex: 1, padding: "1.5rem 2rem", maxWidth: "1600px", width: "100%", margin: "0 auto" }}>
