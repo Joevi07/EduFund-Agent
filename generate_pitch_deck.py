@@ -489,10 +489,15 @@ def create_presentation():
     p10_3.alignment = PP_ALIGN.CENTER
     p10_3.space_before = Pt(30)
 
-    # Save Presentation
+    # Save Presentation with fallback if file is locked
     pptx_path = os.path.join(os.path.dirname(__file__), "EduFund_Pitch_Deck.pptx")
-    prs.save(pptx_path)
-    print(f"Presentation saved to: {pptx_path}")
+    try:
+        prs.save(pptx_path)
+        print(f"Presentation saved to: {pptx_path}")
+    except PermissionError:
+        pptx_path_v2 = os.path.join(os.path.dirname(__file__), "EduFund_Pitch_Deck_v2.pptx")
+        prs.save(pptx_path_v2)
+        print(f"Original file was locked. Presentation saved to: {pptx_path_v2}")
 
 if __name__ == "__main__":
     create_presentation()
