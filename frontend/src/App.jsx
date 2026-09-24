@@ -231,6 +231,7 @@ export default function App() {
               opportunities={opportunities}
               currency={currency}
               applications={applications}
+              plan={plan}
               onUpdateStatus={handleApplicationStatus}
             />
           )}

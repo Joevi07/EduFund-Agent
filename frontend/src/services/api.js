@@ -117,10 +117,28 @@ export async function generateFundingPlan(profile, category = "All") {
       remaining_gap_inr: Math.max(0, gap - 75000),
       remaining_gap_usd: Math.max(0, Math.round((gap - 75000) / 83)),
       coverage_percentage: 100,
+      confidence: {
+        guaranteed_inr: aid,
+        probable_inr: Math.min(gap, 50000),
+        possible_inr: Math.min(Math.max(0, gap - 50000), 25000),
+        remaining_risk_inr: Math.max(0, gap - 75000),
+        confidence_score: Math.min(100, Math.round(((aid + 75000) / Math.max(cost, 1)) * 100)),
+        explanation: "Confidence separates confirmed funding from likely and possible outcomes."
+      },
       recommended_strategy: FALLBACK_STRATEGY,
       agent_advice: "Strategy portfolio optimized to cover target education funding gap!"
     };
   }
+}
+
+export async function checkDraftEvidence(profile, draftText) {
+  const res = await fetch(`${API_BASE_URL}/autopilot/evidence-check`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ student_profile: profile, draft_text: draftText }),
+  });
+  if (!res.ok) throw new Error("Unable to check essay evidence");
+  return res.json();
 }
 
 export async function simulateStrategyScenario(profile, coverageTargetPct, extraWorkStudyInr, increasedAidInr) {

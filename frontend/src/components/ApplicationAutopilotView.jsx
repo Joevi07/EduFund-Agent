@@ -16,7 +16,7 @@ import {
   GraduationCap,
   Scissors
 } from "lucide-react";
-import { generateAutopilotDraft, refineAutopilotDraft } from "../services/api";
+import { generateAutopilotDraft, refineAutopilotDraft, checkDraftEvidence } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
 
 export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, onUpdateStatus }) {
@@ -30,6 +30,8 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
 
   const [safetyApproved, setSafetyApproved] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
+  const [evidence, setEvidence] = useState(null);
+  const [checkingEvidence, setCheckingEvidence] = useState(false);
 
   const oppId = selectedOpportunity ? selectedOpportunity.id : "opp_001";
   const oppTitle = selectedOpportunity ? selectedOpportunity.title : "Reliance Foundation STEM Scholarship";
@@ -41,6 +43,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
         const res = await generateAutopilotDraft(oppId, 0, profile);
         setAutopilotData(res);
         setEditedDraft(res.draft_response || "");
+        setEvidence(null);
         const words = (res.draft_response || "").split(" ").length;
         setWordCount(words);
         setReadingTime(Math.max(0.5, Math.round((words / 200) * 10) / 10));
@@ -75,6 +78,15 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
     const words = val.trim() ? val.trim().split(/\s+/).length : 0;
     setWordCount(words);
     setReadingTime(Math.max(0.5, Math.round((words / 200) * 10) / 10));
+    setEvidence(null);
+  };
+
+  const handleEvidenceCheck = async () => {
+    if (!editedDraft.trim()) return;
+    setCheckingEvidence(true);
+    try { setEvidence(await checkDraftEvidence(profile, editedDraft)); }
+    catch (err) { console.error("Evidence check error:", err); }
+    finally { setCheckingEvidence(false); }
   };
 
   const handleSafetySubmit = async () => {
@@ -200,6 +212,23 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
                   marginBottom: "1rem"
                 }}
               />
+              <div className="evidence-action">
+                <button className="btn-secondary" onClick={handleEvidenceCheck} disabled={checkingEvidence || !editedDraft.trim()}>
+                  <ShieldCheck size={15}/>{checkingEvidence ? "Checking profile evidence…" : "Check profile evidence"}
+                </button>
+                <span>Flags strong claims that are not represented in your saved profile.</span>
+              </div>
+              {evidence && (
+                <div className="evidence-results">
+                  <div className="evidence-summary"><strong>{evidence.supported_count}</strong> supported profile facts <span>·</span> <strong>{evidence.review_count}</strong> claims to review</div>
+                  {evidence.findings.length === 0 ? <p>No profile-linked or high-risk claims were found. Review the draft manually before submitting.</p> : evidence.findings.map((finding, index) => (
+                    <div className={`evidence-finding ${finding.status === "SUPPORTED" ? "supported" : "review"}`} key={`${finding.claim}-${index}`}>
+                      <span>{finding.status === "SUPPORTED" ? "Profile supported" : "Review claim"}</span>
+                      <p>{finding.claim}</p><small>{finding.detail}</small>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Human Safety Control */}

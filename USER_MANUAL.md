@@ -14,10 +14,14 @@ If account creation says **“services are offline”**, the first terminal is n
 
 1. **Create account** — use your name, email, and a password of at least eight characters.
 2. **Profile Agent** — add your study level, course, GPA, location, family-income range, annual education cost, confirmed aid, and achievements. Select **Save profile**.
-3. **Funding Planner** — review your remaining funding gap and the expected-value priority order. Treat it as a planning aid, not a guarantee of an award.
+3. **Funding Planner** — review your remaining funding gap, expected-value priority order, and the **Funding Confidence Meter**. Guaranteed funding is already confirmed; probable and possible figures are planning estimates. Treat all estimates as a planning aid, not a guarantee of an award.
 4. **Opportunity Market** — filter the verified catalogue. Use the external-link icon on every card to open the programme's official website and confirm the current rules, dates, documents, and amount.
 5. **Autopilot Studio** — choose an opportunity, use the checklist, audit files, and edit the draft. Never submit a statement you have not personally reviewed.
-6. **Pipeline & Deadlines** — move each item through Discovered, Planned, Drafting, Ready to Submit, and Submitted. Begin with the nearest deadline.
+6. **Pipeline & Deadlines** — move each item through Discovered, Planned, Drafting, Ready to Submit, and Submitted. The **Document Reuse Map** shows documents that can support more than one active application, while the **Deadline Collision Detector** highlights deadlines that fall within the same seven-day window. Begin with the nearest deadline.
+
+### Verify an essay before authorising it
+
+In **Autopilot Studio**, select **Check profile evidence** after editing the draft. The Evidence Checker compares direct claims in the essay with the academic interests and achievements saved in your profile. Review every amber claim, add verifiable evidence, or rewrite it in your own words. It is a safeguard, not proof of eligibility or fact-checking against external sources.
 
 ## Important safety notes
 

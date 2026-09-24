@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, TrendingUp, Zap, Calculator, Bot } from "lucide-react";
+import { Target, TrendingUp, Zap, Calculator, Bot, ShieldCheck, AlertTriangle } from "lucide-react";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 
 export default function FundingPlannerView({ plan, profile, currency, onNavigate, onScenarioResult }) {
@@ -13,6 +13,21 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
   ];
 
   const urgencyColor = (u) => u === "HIGH" ? "badge-low" : u === "MEDIUM" ? "badge-medium" : "badge-high";
+  const confidence = plan.confidence || {
+    guaranteed_inr: plan.confirmed_aid_inr,
+    probable_inr: Math.round(plan.potential_coverage_inr * .65),
+    possible_inr: Math.round(plan.potential_coverage_inr * .35),
+    remaining_risk_inr: plan.remaining_gap_inr,
+    confidence_score: plan.coverage_percentage,
+    explanation: "Confidence separates confirmed funding from likely and possible outcomes.",
+  };
+  const confidenceParts = [
+    { label:"Guaranteed", value:confidence.guaranteed_inr, color:"#29a557" },
+    { label:"Probable", value:confidence.probable_inr, color:"#12a3a5" },
+    { label:"Possible", value:confidence.possible_inr, color:"#6366f1" },
+    { label:"Risk", value:confidence.remaining_risk_inr, color:"#d97706" },
+  ];
+  const fmtInr = (amount) => isINR ? `₹${Math.round(amount).toLocaleString()}` : `$${Math.round(amount / 83).toLocaleString()}`;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
@@ -60,6 +75,23 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
         <div className="bento-box">
           <StrategySimulatorWidget profile={profile} currency={currency} onScenarioResult={onScenarioResult}/>
         </div>
+      </div>
+
+      <div className="bento-box confidence-meter">
+        <div className="confidence-heading">
+          <div>
+            <h3><ShieldCheck size={18} color="var(--accent-teal)"/> Funding Confidence Meter</h3>
+            <p>Expected-value outlook for this plan. It is a decision aid, not an award guarantee.</p>
+          </div>
+          <div className="confidence-score"><strong>{confidence.confidence_score}%</strong><span>coverage confidence</span></div>
+        </div>
+        <div className="confidence-track" aria-label="Funding confidence breakdown">
+          {confidenceParts.map(part => <span key={part.label} style={{ width:`${Math.max(2, (part.value / Math.max(plan.total_cost_inr, 1)) * 100)}%`, background:part.color }} />)}
+        </div>
+        <div className="confidence-legend">
+          {confidenceParts.map(part => <div key={part.label}><i style={{ background:part.color }}/><span>{part.label}</span><strong>{fmtInr(part.value)}</strong></div>)}
+        </div>
+        <div className="confidence-note"><AlertTriangle size={14}/>{confidence.explanation}</div>
       </div>
 
       {/* Strategy table */}
