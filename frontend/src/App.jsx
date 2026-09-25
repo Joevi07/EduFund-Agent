@@ -188,6 +188,7 @@ export default function App() {
               onNavigate={setActiveTab}
               onScenarioResult={handleScenarioResult}
               opportunitiesCount={opportunities.length}
+              opportunities={opportunities}
             />
           )}
 

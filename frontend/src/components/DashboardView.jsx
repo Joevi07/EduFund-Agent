@@ -3,7 +3,7 @@ import { TrendingUp, ShieldCheck, ArrowRight, Zap, Target, Layers, AlertTriangle
 import AgentNodeGraph from "./AgentNodeGraph";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 
-export default function DashboardView({ profile, plan, currency, onNavigate, onScenarioResult, opportunitiesCount = 0 }) {
+export default function DashboardView({ profile, plan, currency, onNavigate, onScenarioResult, opportunitiesCount = 0, opportunities = [] }) {
   const [logFilter, setLogFilter] = useState("All");
   const [showAlert, setShowAlert] = useState(true);
 
@@ -20,6 +20,20 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
   const fmt   = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
 
   const stratCount  = plan?.recommended_strategy?.length ?? 0;
+  const priorityItems = stratCount ? plan.recommended_strategy.slice(0, 3) : opportunities
+    .filter(opp => opp.days_left >= 0)
+    .sort((a, b) => (a.days_left - b.days_left) || (b.amount_inr - a.amount_inr))
+    .slice(0, 3)
+    .map((opp, index) => ({
+      opportunity_id: opp.id,
+      title: opp.title,
+      priority_rank: index + 1,
+      match_score: null,
+      expected_value_inr: opp.amount_inr,
+      expected_value_usd: opp.amount_usd,
+      urgency: opp.urgency || "MEDIUM",
+      fallback: true,
+    }));
   const covPct      = plan?.coverage_percentage ?? 100;
   const aidDeg      = Math.round(((plan?.confirmed_aid_inr || 0) / ((plan?.total_cost_inr || 1))) * 360);
 
@@ -164,7 +178,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:".7rem" }}>
-            {plan.recommended_strategy.slice(0, 3).map((item, idx) => (
+            {priorityItems.length ? priorityItems.map((item, idx) => (
               <div key={idx} style={{
                 background:"rgba(255,255,255,.65)", backdropFilter:"blur(12px)",
                 border:"1px solid rgba(18,163,165,.14)", borderRadius:10,
@@ -178,7 +192,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
                 <div>
                   <div style={{ display:"flex", alignItems:"center", gap:".45rem", marginBottom:".3rem" }}>
                     <span className="badge badge-indigo" style={{ fontSize:".65rem" }}>RANK #{item.priority_rank}</span>
-                    <span className="badge badge-high"   style={{ fontSize:".65rem" }}>{item.match_score}% MATCH</span>
+                    <span className="badge badge-high" style={{ fontSize:".65rem" }}>{item.fallback ? "CATALOGUE PRIORITY" : `${item.match_score}% MATCH`}</span>
                     <span className="badge badge-medium" style={{ fontSize:".65rem", display: item.urgency === "HIGH" ? "none" : undefined }}>{item.urgency}</span>
                   </div>
                   <div style={{ fontSize:".9rem", fontWeight:700, color:"var(--text-primary)" }}>{item.title}</div>
@@ -190,7 +204,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
                   Autopilot <Zap size={12}/>
                 </button>
               </div>
-            ))}
+            )) : <div style={{ padding:"1rem", color:"var(--text-secondary)", fontSize:".84rem", border:"1px dashed var(--border-subtle)", borderRadius:10 }}>Loading verified opportunities for your queue…</div>}
           </div>
         </div>
       </div>
