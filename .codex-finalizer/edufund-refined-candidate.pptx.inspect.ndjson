@@ -1,0 +1,299 @@
+{"kind":"deck","id":"pr/23vloj","name":"Deck"}
+{"kind":"layout","layoutId":"747a80bb-3765-4e04-9891-f901276d1982","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"6d8504ca-eb27-4aad-9718-d9e734b37db6","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/mpdmte","slide":1,"title":"EDUFUND","textShapes":13}
+{"kind":"shape","id":"sh/dk7m9kvu","slide":1,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/qhw3e5wj","slide":1,"bbox":[0,0,430,720]}
+{"kind":"textbox","id":"sh/rip47ado","slide":1,"text":"EDUFUND","textPreview":"EDUFUND","textChars":7,"textLines":1,"bbox":[62,70,200,18]}
+{"kind":"textbox","id":"sh/0nylkzel","slide":1,"text":"Funding\nis a strategy.","textPreview":"Funding | is a strategy.","textChars":22,"textLines":2,"bbox":[62,185,390,125]}
+{"kind":"textbox","id":"sh/187mdkv6","slide":1,"text":"An AI-guided workspace that turns a student profile into a funding plan and a safer application process.","textPreview":"An AI-guided workspace that turns a student profile into a funding plan and a safer application process.","textChars":104,"textLines":1,"bbox":[62,350,300,92]}
+{"kind":"shape","id":"sh/elg3ipwf","slide":1,"bbox":[62,500,150,27]}
+{"kind":"textbox","id":"sh/fmp4bud0","slide":1,"text":"HACKATHON PITCH","textPreview":"HACKATHON PITCH","textChars":15,"textLines":1,"bbox":[70,507,134,13]}
+{"kind":"shape","id":"sh/obi5ozeh","slide":1,"bbox":[508,90,625,526]}
+{"kind":"shape","id":"sh/pcrmh4v2","slide":1,"bbox":[570,152,500,402]}
+{"kind":"textbox","id":"sh/h4zetwj6","slide":1,"text":"Annual cost","textPreview":"Annual cost","textChars":11,"textLines":1,"bbox":[620,204,180,18]}
+{"kind":"textbox","id":"sh/g3qd0b2l","slide":1,"text":"₹2,00,000","textPreview":"₹2,00,000","textChars":9,"textLines":1,"bbox":[620,233,260,42]}
+{"kind":"shape","id":"sh/f2hwr610","slide":1,"bbox":[620,298,395,0]}
+{"kind":"textbox","id":"sh/uh8vy1kf","slide":1,"text":"Confirmed aid","textPreview":"Confirmed aid","textChars":13,"textLines":1,"bbox":[620,325,180,18]}
+{"kind":"textbox","id":"sh/p8jexgj2","slide":1,"text":"₹30,000","textPreview":"₹30,000","textChars":7,"textLines":1,"bbox":[620,354,230,36]}
+{"kind":"textbox","id":"sh/o7ax4b2h","slide":1,"text":"Remaining gap","textPreview":"Remaining gap","textChars":13,"textLines":1,"bbox":[620,424,180,18]}
+{"kind":"textbox","id":"sh/361wv61w","slide":1,"text":"₹1,70,000","textPreview":"₹1,70,000","textChars":9,"textLines":1,"bbox":[620,453,280,42]}
+{"kind":"textbox","id":"sh/258f21kb","slide":1,"text":"A plan starts here","textPreview":"A plan starts here","textChars":18,"textLines":1,"bbox":[620,522,260,20]}
+{"kind":"textbox","id":"sh/5cfelcjy","slide":1,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/kb6dsr2d","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"notes","id":"nt/mpdmte","slide":1,"text":"Open with the student outcome: this product turns funding from a search task into a decision process."}
+{"kind":"slide","id":"sl/umw24f","slide":2,"title":"THE PROBLEM","textShapes":18}
+{"kind":"textbox","id":"sh/5sby5cbu","slide":2,"text":"THE PROBLEM","textPreview":"THE PROBLEM","textChars":11,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/ipkzahs3","slide":2,"text":"Students face a funding maze, not a single decision","textPreview":"Students face a funding maze, not a single decision","textChars":51,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/3qtg3mto","slide":2,"text":"Scholarships, grants, fee waivers, documents, and deadlines live in different places.","textPreview":"Scholarships, grants, fee waivers, documents, and deadlines live in different places.","textChars":85,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/gn2h87ux","slide":2,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/hoby1cbi","slide":2,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/ul0z6xc7","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"textbox","id":"sh/vm9gz2tc","slide":2,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[74,246,48,18]}
+{"kind":"textbox","id":"sh/0jmhkbah","slide":2,"text":"Opportunities are fragmented","textPreview":"Opportunities are fragmented","textChars":28,"textLines":1,"bbox":[164,242,390,24]}
+{"kind":"textbox","id":"sh/1kvidwbm","slide":2,"text":"Students search across portals, university pages, and grant listings.","textPreview":"Students search across portals, university pages, and grant listings.","textChars":69,"textLines":1,"bbox":[600,245,540,26]}
+{"kind":"shape","id":"sh/xgjm54ne","slide":2,"bbox":[74,303,1081,0]}
+{"kind":"textbox","id":"sh/wfa5wz6t","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[74,335,48,18]}
+{"kind":"textbox","id":"sh/veh43u58","slide":2,"text":"Eligibility hides in details","textPreview":"Eligibility hides in details","textChars":28,"textLines":1,"bbox":[164,331,390,24]}
+{"kind":"textbox","id":"sh/ad83upon","slide":2,"text":"Course, grade, income, and document rules can invalidate an application.","textPreview":"Course, grade, income, and document rules can invalidate an application.","textChars":72,"textLines":1,"bbox":[600,334,540,26]}
+{"kind":"shape","id":"sh/9czm1k7i","slide":2,"bbox":[74,392,1081,0]}
+{"kind":"textbox","id":"sh/8bqlsf6x","slide":2,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[74,424,48,18]}
+{"kind":"textbox","id":"sh/nah4zapc","slide":2,"text":"Application effort repeats","textPreview":"Application effort repeats","textChars":26,"textLines":1,"bbox":[164,420,390,24]}
+{"kind":"textbox","id":"sh/m983qpor","slide":2,"text":"The same marksheets, income proof, and evidence appear across applications.","textPreview":"The same marksheets, income proof, and evidence appear across applications.","textChars":75,"textLines":1,"bbox":[600,423,540,26]}
+{"kind":"shape","id":"sh/t83mdonm","slide":2,"bbox":[74,481,1081,0]}
+{"kind":"textbox","id":"sh/s7u54j61","slide":2,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[74,513,48,18]}
+{"kind":"textbox","id":"sh/cb2p0ned","slide":2,"text":"The real funding gap stays unclear","textPreview":"The real funding gap stays unclear","textChars":34,"textLines":1,"bbox":[164,509,390,24]}
+{"kind":"textbox","id":"sh/dcb69svy","slide":2,"text":"Most directories do not calculate the cost still left to cover.","textPreview":"Most directories do not calculate the cost still left to cover.","textChars":63,"textLines":1,"bbox":[600,512,540,26]}
+{"kind":"shape","id":"sh/q907ydw7","slide":2,"bbox":[74,570,1081,0]}
+{"kind":"textbox","id":"sh/rato7ids","slide":2,"text":"EduFund connects the decisions that students currently make separately.","textPreview":"EduFund connects the decisions that students currently make separately.","textChars":71,"textLines":1,"bbox":[74,617,950,25]}
+{"kind":"notes","id":"nt/umw24f","slide":2,"text":"Keep the problem human and specific. Avoid discussing generic AI claims."}
+{"kind":"slide","id":"sl/xxzqal","slide":3,"title":"THE EDUFUND SYSTEM","textShapes":23}
+{"kind":"textbox","id":"sh/2hormp4f","slide":3,"text":"THE EDUFUND SYSTEM","textPreview":"THE EDUFUND SYSTEM","textChars":18,"textLines":1,"bbox":[62,48,300,16]}
+{"kind":"textbox","id":"sh/pkzah436","slide":3,"text":"Six agents. One student journey.","textPreview":"Six agents. One student journey.","textChars":32,"textLines":1,"bbox":[62,80,770,56]}
+{"kind":"textbox","id":"sh/ojq9ozml","slide":3,"text":"Each agent handles a different part of the funding workflow, while the student stays in control.","textPreview":"Each agent handles a different part of the funding workflow, while the student stays in control.","textChars":96,"textLines":1,"bbox":[62,147,860,30]}
+{"kind":"shape","id":"sh/bmhsjelc","slide":3,"bbox":[61,250,350,132]}
+{"kind":"shape","id":"sh/al8bq94r","slide":3,"bbox":[83,272,11,88]}
+{"kind":"textbox","id":"sh/x8zalo32","slide":3,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[116,275,40,16]}
+{"kind":"textbox","id":"sh/c7qtsjmx","slide":3,"text":"Profile","textPreview":"Profile","textChars":7,"textLines":1,"bbox":[116,303,240,25]}
+{"kind":"textbox","id":"sh/rqxs7a5s","slide":3,"text":"Captures study, finances, and goals","textPreview":"Captures study, finances, and goals","textChars":35,"textLines":1,"bbox":[116,336,250,22]}
+{"kind":"shape","id":"sh/qp4re54n","slide":3,"bbox":[453,250,350,132]}
+{"kind":"shape","id":"sh/83u1032l","slide":3,"bbox":[475,272,11,88]}
+{"kind":"textbox","id":"sh/943it836","slide":3,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[508,275,40,16]}
+{"kind":"textbox","id":"sh/m1cjytkf","slide":3,"text":"Discovery","textPreview":"Discovery","textChars":9,"textLines":1,"bbox":[508,303,240,25]}
+{"kind":"textbox","id":"sh/72l0ryl0","slide":3,"text":"Finds profile-relevant opportunities","textPreview":"Finds profile-relevant opportunities","textChars":36,"textLines":1,"bbox":[508,336,250,22]}
+{"kind":"shape","id":"sh/wre1432x","slide":3,"bbox":[845,250,350,132]}
+{"kind":"shape","id":"sh/hsnix832","slide":3,"bbox":[867,272,11,88]}
+{"kind":"textbox","id":"sh/u5cj2dkr","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[900,275,40,16]}
+{"kind":"textbox","id":"sh/v6l0vilc","slide":3,"text":"Eligibility","textPreview":"Eligibility","textChars":11,"textLines":1,"bbox":[900,303,240,25]}
+{"kind":"textbox","id":"sh/cbahsjmd","slide":3,"text":"Checks rules against the profile","textPreview":"Checks rules against the profile","textChars":32,"textLines":1,"bbox":[900,336,250,22]}
+{"kind":"shape","id":"sh/xwjilo3y","slide":3,"bbox":[61,430,350,132]}
+{"kind":"shape","id":"sh/tgrq9grq","slide":3,"bbox":[83,452,11,88]}
+{"kind":"textbox","id":"sh/sfip0ba5","slide":3,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[116,455,40,16]}
+{"kind":"textbox","id":"sh/re9o769k","slide":3,"text":"Planner","textPreview":"Planner","textChars":7,"textLines":1,"bbox":[116,483,240,25]}
+{"kind":"textbox","id":"sh/6d07y1sz","slide":3,"text":"Ranks an expected-value portfolio","textPreview":"Ranks an expected-value portfolio","textChars":33,"textLines":1,"bbox":[116,516,250,22]}
+{"kind":"shape","id":"sh/1kbqdgrm","slide":3,"bbox":[453,430,350,132]}
+{"kind":"shape","id":"sh/gj2p4va1","slide":3,"bbox":[475,452,11,88]}
+{"kind":"textbox","id":"sh/fit8bq9g","slide":3,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[508,455,40,16]}
+{"kind":"textbox","id":"sh/eh072lsv","slide":3,"text":"Autopilot","textPreview":"Autopilot","textChars":9,"textLines":1,"bbox":[508,483,240,25]}
+{"kind":"textbox","id":"sh/pobqh0ry","slide":3,"text":"Prepares documents and essay support","textPreview":"Prepares documents and essay support","textChars":36,"textLines":1,"bbox":[508,516,250,22]}
+{"kind":"shape","id":"sh/on2p8vad","slide":3,"bbox":[845,430,350,132]}
+{"kind":"shape","id":"sh/mtwn2x8v","slide":3,"bbox":[867,452,11,88]}
+{"kind":"textbox","id":"sh/7u54b2p0","slide":3,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[900,455,40,16]}
+{"kind":"textbox","id":"sh/8ve547ql","slide":3,"text":"Deadline","textPreview":"Deadline","textChars":8,"textLines":1,"bbox":[900,483,240,25]}
+{"kind":"textbox","id":"sh/9wnmdc76","slide":3,"text":"Surfaces collisions and reuse","textPreview":"Surfaces collisions and reuse","textChars":29,"textLines":1,"bbox":[900,516,250,22]}
+{"kind":"textbox","id":"sh/uxwn6x8r","slide":3,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/vy54f2pc","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"notes","id":"nt/xxzqal","slide":3,"text":"The original deck used six agents. Here they are clearer and map directly to the working product."}
+{"kind":"slide","id":"sl/nr8k38","slide":4,"title":"FINANCIAL ENGINE","textShapes":20}
+{"kind":"textbox","id":"sh/0j214ba1","slide":4,"text":"FINANCIAL ENGINE","textPreview":"FINANCIAL ENGINE","textChars":16,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/zytkv6tg","slide":4,"text":"A funding plan begins with the amount still left to cover","textPreview":"A funding plan begins with the amount still left to cover","textChars":57,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/yxkj21sv","slide":4,"text":"The planner frames each recommendation against the student's target annual cost and confirmed support.","textPreview":"The planner frames each recommendation against the student's target annual cost and confirmed support.","textChars":102,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/dwb2twba","slide":4,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/cv210rup","slide":4,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/bu9krmtk","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/qt0jy1cz","slide":4,"bbox":[60,245,1160,116]}
+{"kind":"textbox","id":"sh/psr2pwbe","slide":4,"text":"Target annual cost","textPreview":"Target annual cost","textChars":18,"textLines":1,"bbox":[92,271,250,17]}
+{"kind":"textbox","id":"sh/ori1wrut","slide":4,"text":"₹ 2,00,000","textPreview":"₹ 2,00,000","textChars":10,"textLines":1,"bbox":[92,299,250,32]}
+{"kind":"textbox","id":"sh/61s3a90f","slide":4,"text":"−","textPreview":"−","textChars":1,"textLines":1,"bbox":[387,298,30,32]}
+{"kind":"textbox","id":"sh/721kjeh0","slide":4,"text":"Confirmed aid","textPreview":"Confirmed aid","textChars":13,"textLines":1,"bbox":[462,271,250,17]}
+{"kind":"textbox","id":"sh/s3alczil","slide":4,"text":"− ₹ 30,000","textPreview":"− ₹ 30,000","textChars":10,"textLines":1,"bbox":[462,299,250,32]}
+{"kind":"textbox","id":"sh/t4j2l4z6","slide":4,"text":"=","textPreview":"=","textChars":1,"textLines":1,"bbox":[757,298,30,32]}
+{"kind":"textbox","id":"sh/yx836p0j","slide":4,"text":"Remaining gap","textPreview":"Remaining gap","textChars":13,"textLines":1,"bbox":[832,271,250,17]}
+{"kind":"textbox","id":"sh/jy1kfuho","slide":4,"text":"₹ 1,70,000","textPreview":"₹ 1,70,000","textChars":10,"textLines":1,"bbox":[832,299,250,32]}
+{"kind":"textbox","id":"sh/kzal8zi9","slide":4,"text":"Funding Confidence Meter","textPreview":"Funding Confidence Meter","textChars":24,"textLines":1,"bbox":[60,425,420,32]}
+{"kind":"textbox","id":"sh/l0j2h4zu","slide":4,"text":"Separates what is already confirmed from probable, possible, and uncovered funding.","textPreview":"Separates what is already confirmed from probable, possible, and uncovered funding.","textChars":83,"textLines":1,"bbox":[60,465,575,28]}
+{"kind":"shape","id":"sh/a98j2p07","slide":4,"bbox":[60,540,180,18]}
+{"kind":"textbox","id":"sh/bahkbahs","slide":4,"text":"Confirmed","textPreview":"Confirmed","textChars":9,"textLines":1,"bbox":[60,572,180,16]}
+{"kind":"shape","id":"sh/f2d8nmt8","slide":4,"bbox":[252,540,260,18]}
+{"kind":"textbox","id":"sh/e14ruhcn","slide":4,"text":"Probable","textPreview":"Probable","textChars":8,"textLines":1,"bbox":[252,572,260,16]}
+{"kind":"shape","id":"sh/14vqpwbe","slide":4,"bbox":[524,540,180,18]}
+{"kind":"textbox","id":"sh/03m9wrut","slide":4,"text":"Possible","textPreview":"Possible","textChars":8,"textLines":1,"bbox":[524,572,180,16]}
+{"kind":"shape","id":"sh/n6d8r6tk","slide":4,"bbox":[716,540,270,18]}
+{"kind":"textbox","id":"sh/254ry1cz","slide":4,"text":"Uncovered","textPreview":"Uncovered","textChars":9,"textLines":1,"bbox":[716,572,270,16]}
+{"kind":"textbox","id":"sh/psvqtwba","slide":4,"text":"Decision support only. Funding providers make award decisions.","textPreview":"Decision support only. Funding providers make award decisions.","textChars":62,"textLines":1,"bbox":[60,627,800,18]}
+{"kind":"notes","id":"nt/nr8k38","slide":4,"text":"The confidence meter does not promise awards. Make that boundary explicit."}
+{"kind":"slide","id":"sl/z3tywz","slide":5,"title":"PLANNER AGENT","textShapes":14}
+{"kind":"textbox","id":"sh/9cri987a","slide":5,"text":"PLANNER AGENT","textPreview":"PLANNER AGENT","textChars":13,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/mpgzetoz","slide":5,"text":"Expected value helps prioritise application effort","textPreview":"Expected value helps prioritise application effort","textChars":50,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/7qp07ypk","slide":5,"text":"The portfolio ranks opportunities by funding amount, profile match, and deadline urgency.","textPreview":"The portfolio ranks opportunities by funding amount, profile match, and deadline urgency.","textChars":89,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/wfihk361","slide":5,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/hgrid87m","slide":5,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/ud0zidov","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/ve90bipg","slide":5,"bbox":[60,250,535,310]}
+{"kind":"textbox","id":"sh/cjeh8j6h","slide":5,"text":"Expected value","textPreview":"Expected value","textChars":14,"textLines":1,"bbox":[92,284,260,24]}
+{"kind":"textbox","id":"sh/xk7i1o72","slide":5,"text":"Funding amount  ×  match score  ×  urgency","textPreview":"Funding amount  ×  match score  ×  urgency","textChars":42,"textLines":1,"bbox":[92,330,410,29]}
+{"kind":"shape","id":"sh/5kj6l072","slide":5,"bbox":[92,381,442,0]}
+{"kind":"textbox","id":"sh/kjapcvqh","slide":5,"text":"High-value opportunities can move ahead of lower-fit listings, even when both look attractive at first glance.","textPreview":"High-value opportunities can move ahead of lower-fit listings, even when both look attractive at first glance.","textChars":110,"textLines":1,"bbox":[92,407,420,70]}
+{"kind":"shape","id":"sh/ji1ojqpw","slide":5,"bbox":[92,502,160,27]}
+{"kind":"textbox","id":"sh/yhs7a58r","slide":5,"text":"RANKED PORTFOLIO","textPreview":"RANKED PORTFOLIO","textChars":16,"textLines":1,"bbox":[100,509,144,13]}
+{"kind":"shape","id":"sh/to36pk7e","slide":5,"bbox":[635,250,585,310]}
+{"kind":"textbox","id":"sh/snapgfqt","slide":5,"text":"What-if scenario","textPreview":"What-if scenario","textChars":16,"textLines":1,"bbox":[675,284,270,24]}
+{"kind":"textbox","id":"sh/7m1onap8","slide":5,"text":"What happens if confirmed aid increases?","textPreview":"What happens if confirmed aid increases?","textChars":40,"textLines":1,"bbox":[675,332,420,20]}
+{"kind":"textbox","id":"sh/6ls7e58n","slide":5,"text":"What happens if work-study income is added?","textPreview":"What happens if work-study income is added?","textChars":43,"textLines":1,"bbox":[675,374,420,20]}
+{"kind":"textbox","id":"sh/hc3qtk7a","slide":5,"text":"The planner recalculates the remaining gap and recommended portfolio.","textPreview":"The planner recalculates the remaining gap and recommended portfolio.","textChars":69,"textLines":1,"bbox":[675,435,440,46]}
+{"kind":"shape","id":"sh/gbupkf6p","slide":5,"bbox":[675,508,286,14]}
+{"kind":"shape","id":"sh/0rmhcnid","slide":5,"bbox":[965,508,120,14]}
+{"kind":"textbox","id":"sh/1svi5sjy","slide":5,"text":"Gap coverage changes in real time","textPreview":"Gap coverage changes in real time","textChars":33,"textLines":1,"bbox":[675,540,340,18]}
+{"kind":"notes","id":"nt/z3tywz","slide":5,"text":"The scenario simulator supports real values from the student profile."}
+{"kind":"slide","id":"sl/80pisk","slide":6,"title":"APPLICATION AUTOPILOT","textShapes":19}
+{"kind":"textbox","id":"sh/5wrq503a","slide":6,"text":"APPLICATION AUTOPILOT","textPreview":"APPLICATION AUTOPILOT","textChars":21,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/itgrul4z","slide":6,"text":"Preparation gets faster. Submission remains human.","textPreview":"Preparation gets faster. Submission remains human.","textChars":50,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/ju983ql4","slide":6,"text":"The studio drafts against an opportunity prompt, checks requirements, and places review before finalisation.","textPreview":"The studio drafts against an opportunity prompt, checks requirements, and places review before finalisation.","textChars":108,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/wry9sbmt","slide":6,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/hs7q1g3e","slide":6,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/upgrql4n","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/vqp8z6l8","slide":6,"bbox":[60,261,256,213]}
+{"kind":"textbox","id":"sh/gn294f2x","slide":6,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[82,286,40,17]}
+{"kind":"textbox","id":"sh/1obadk3i","slide":6,"text":"Opportunity prompt","textPreview":"Opportunity prompt","textChars":18,"textLines":1,"bbox":[82,331,208,42]}
+{"kind":"textbox","id":"sh/dwj2p0ru","slide":6,"text":"Uses the selected programme's essay prompt and document list.","textPreview":"Uses the selected programme's essay prompt and document list.","textChars":61,"textLines":1,"bbox":[82,392,207,54]}
+{"kind":"shape","id":"sh/cvalgvq9","slide":6,"bbox":[316,366,26,0]}
+{"kind":"shape","id":"sh/ru1knq9o","slide":6,"bbox":[350,261,256,213]}
+{"kind":"textbox","id":"sh/qt83el83","slide":6,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[372,286,40,17]}
+{"kind":"textbox","id":"sh/psz2lgri","slide":6,"text":"Tailored draft","textPreview":"Tailored draft","textChars":14,"textLines":1,"bbox":[372,331,208,42]}
+{"kind":"textbox","id":"sh/4rqlcvqx","slide":6,"text":"Builds a response using profile information and the student's edits.","textPreview":"Builds a response using profile information and the student's edits.","textChars":68,"textLines":1,"bbox":[372,392,207,54]}
+{"kind":"shape","id":"sh/3qhkjq9c","slide":6,"bbox":[606,366,26,0]}
+{"kind":"shape","id":"sh/2p83al87","slide":6,"bbox":[640,261,256,213]}
+{"kind":"textbox","id":"sh/9o3mxk72","slide":6,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[662,286,40,17]}
+{"kind":"textbox","id":"sh/onulofqh","slide":6,"text":"Tone refinement","textPreview":"Tone refinement","textChars":15,"textLines":1,"bbox":[662,331,208,42]}
+{"kind":"textbox","id":"sh/83mdgn2p","slide":6,"text":"Supports concise, persuasive, and academic rewrites.","textPreview":"Supports concise, persuasive, and academic rewrites.","textChars":52,"textLines":1,"bbox":[662,392,207,54]}
+{"kind":"shape","id":"sh/t4ve9sja","slide":6,"bbox":[896,366,26,0]}
+{"kind":"shape","id":"sh/6hkvedkj","slide":6,"bbox":[930,261,256,213]}
+{"kind":"textbox","id":"sh/72tw7i14","slide":6,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[952,286,40,17]}
+{"kind":"textbox","id":"sh/kf2dc32t","slide":6,"text":"Student authorisation","textPreview":"Student authorisation","textChars":21,"textLines":1,"bbox":[952,331,208,42]}
+{"kind":"textbox","id":"sh/lgbe58jy","slide":6,"text":"The student reviews the final packet before visiting the official portal.","textPreview":"The student reviews the final packet before visiting the official portal.","textChars":73,"textLines":1,"bbox":[952,392,207,54]}
+{"kind":"shape","id":"sh/ydkvadkn","slide":6,"bbox":[60,547,1160,50]}
+{"kind":"textbox","id":"sh/jetw3y18","slide":6,"text":"Safety boundary","textPreview":"Safety boundary","textChars":15,"textLines":1,"bbox":[86,564,155,17]}
+{"kind":"textbox","id":"sh/wb2d832h","slide":6,"text":"EduFund never submits forms or financial documents without explicit student review.","textPreview":"EduFund never submits forms or financial documents without explicit student review.","textChars":83,"textLines":1,"bbox":[276,563,820,20]}
+{"kind":"notes","id":"nt/80pisk","slide":6,"text":"This has the original content but replaces emotive icons and slogans with a clean trust statement."}
+{"kind":"slide","id":"sl/yxdppx","slide":7,"title":"APPLICATION QUALITY","textShapes":15}
+{"kind":"textbox","id":"sh/pwbqdk3i","slide":7,"text":"APPLICATION QUALITY","textPreview":"APPLICATION QUALITY","textChars":19,"textLines":1,"bbox":[60,45,300,16]}
+{"kind":"textbox","id":"sh/2t0ri547","slide":7,"text":"Evidence before confidence.","textPreview":"Evidence before confidence.","textChars":27,"textLines":1,"bbox":[60,80,770,55]}
+{"kind":"textbox","id":"sh/nut8bals","slide":7,"text":"The system checks what the draft says against what the student's profile can support.","textPreview":"The system checks what the draft says against what the student's profile can support.","textChars":85,"textLines":1,"bbox":[60,147,820,28]}
+{"kind":"shape","id":"sh/cz29ozm9","slide":7,"bbox":[60,247,520,300]}
+{"kind":"textbox","id":"sh/x0bqhk3u","slide":7,"text":"Essay Evidence Checker","textPreview":"Essay Evidence Checker","textChars":22,"textLines":1,"bbox":[92,284,330,25]}
+{"kind":"textbox","id":"sh/axkrmp43","slide":7,"text":"Supported profile facts","textPreview":"Supported profile facts","textChars":23,"textLines":1,"bbox":[92,338,210,19]}
+{"kind":"textbox","id":"sh/byt8fulo","slide":7,"text":"Course, GPA, achievements, and interests","textPreview":"Course, GPA, achievements, and interests","textChars":40,"textLines":1,"bbox":[92,368,360,22]}
+{"kind":"textbox","id":"sh/s3ipcvm5","slide":7,"text":"Claims to review","textPreview":"Claims to review","textChars":16,"textLines":1,"bbox":[92,428,210,19]}
+{"kind":"textbox","id":"sh/d4rq503q","slide":7,"text":"Strong statements that do not appear in the saved profile","textPreview":"Strong statements that do not appear in the saved profile","textChars":57,"textLines":1,"bbox":[92,458,390,42]}
+{"kind":"shape","id":"sh/dczyd4n6","slide":7,"bbox":[620,247,600,300]}
+{"kind":"textbox","id":"sh/cb6hkz61","slide":7,"text":"Document Auditor","textPreview":"Document Auditor","textChars":16,"textLines":1,"bbox":[652,284,300,25]}
+{"kind":"textbox","id":"sh/baxgbu5g","slide":7,"text":"Required documents","textPreview":"Required documents","textChars":18,"textLines":1,"bbox":[652,338,210,19]}
+{"kind":"textbox","id":"sh/q9ozipov","slide":7,"text":"Marksheets, income proof, letters, and programme-specific evidence","textPreview":"Marksheets, income proof, letters, and programme-specific evidence","textChars":66,"textLines":1,"bbox":[652,368,440,42]}
+{"kind":"textbox","id":"sh/lgzyh4ni","slide":7,"text":"Readiness result","textPreview":"Readiness result","textChars":16,"textLines":1,"bbox":[652,440,210,19]}
+{"kind":"textbox","id":"sh/0fqhoj6x","slide":7,"text":"Shows missing items before the student starts the provider's application form","textPreview":"Shows missing items before the student starts the provider's application form","textChars":77,"textLines":1,"bbox":[652,470,440,42]}
+{"kind":"textbox","id":"sh/zehgfe5c","slide":7,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/yd8zm9or","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"notes","id":"nt/yxdppx","slide":7,"text":"Demo the difference between a profile-supported statement and a claim that needs revision."}
+{"kind":"slide","id":"sl/67xgoj","slide":8,"title":"PIPELINE INTELLIGENCE","textShapes":16}
+{"kind":"textbox","id":"sh/j2pkzits","slide":8,"text":"PIPELINE INTELLIGENCE","textPreview":"PIPELINE INTELLIGENCE","textChars":21,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/k3y1snud","slide":8,"text":"One document can unlock several applications","textPreview":"One document can unlock several applications","textChars":44,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/547218bi","slide":8,"text":"The pipeline identifies reusable evidence and deadline windows that need attention first.","textPreview":"The pipeline identifies reusable evidence and deadline windows that need attention first.","textChars":89,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/adwjmtcv","slide":8,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/vepkvydg","slide":8,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/wzy1o3u1","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/x072x8bm","slide":8,"bbox":[60,250,540,306]}
+{"kind":"textbox","id":"sh/m9wjitcz","slide":8,"text":"Document Reuse Map","textPreview":"Document Reuse Map","textChars":18,"textLines":1,"bbox":[94,282,330,27]}
+{"kind":"textbox","id":"sh/na50rydk","slide":8,"text":"Income proof","textPreview":"Income proof","textChars":12,"textLines":1,"bbox":[94,339,210,20]}
+{"kind":"shape","id":"sh/bmx8v6p4","slide":8,"bbox":[94,377,436,0]}
+{"kind":"textbox","id":"sh/ql47218z","slide":8,"text":"Scholarship A","textPreview":"Scholarship A","textChars":13,"textLines":1,"bbox":[94,401,185,18]}
+{"kind":"textbox","id":"sh/d8fqxg7a","slide":8,"text":"Scholarship B","textPreview":"Scholarship B","textChars":13,"textLines":1,"bbox":[294,401,185,18]}
+{"kind":"textbox","id":"sh/cn694bqp","slide":8,"text":"Fee waiver","textPreview":"Fee waiver","textChars":10,"textLines":1,"bbox":[94,445,185,18]}
+{"kind":"textbox","id":"sh/zax8z6pg","slide":8,"text":"One prepared document can satisfy several active requirements.","textPreview":"One prepared document can satisfy several active requirements.","textChars":62,"textLines":1,"bbox":[94,502,400,25]}
+{"kind":"shape","id":"sh/y9or61ov","slide":8,"bbox":[640,250,580,306]}
+{"kind":"textbox","id":"sh/lcfq1g7m","slide":8,"text":"Deadline Collision Detector","textPreview":"Deadline Collision Detector","textChars":27,"textLines":1,"bbox":[674,282,365,27]}
+{"kind":"textbox","id":"sh/0b698b61","slide":8,"text":"7 days","textPreview":"7 days","textChars":6,"textLines":1,"bbox":[674,341,90,32]}
+{"kind":"textbox","id":"sh/fed8nmpc","slide":8,"text":"before the closest deadline","textPreview":"before the closest deadline","textChars":27,"textLines":1,"bbox":[782,348,300,18]}
+{"kind":"shape","id":"sh/edk7uh8r","slide":8,"bbox":[674,390,456,0]}
+{"kind":"textbox","id":"sh/i9sb2p8z","slide":8,"text":"Flags active applications that close in the same seven-day window.","textPreview":"Flags active applications that close in the same seven-day window.","textChars":66,"textLines":1,"bbox":[674,416,430,42]}
+{"kind":"textbox","id":"sh/ja1cbu9k","slide":8,"text":"Use the signal to sequence writing, review, and document collection.","textPreview":"Use the signal to sequence writing, review, and document collection.","textChars":68,"textLines":1,"bbox":[674,486,430,38]}
+{"kind":"notes","id":"nt/67xgoj","slide":8,"text":"The pipeline reduces last-minute stress by showing what can be reused and what must be completed first."}
+{"kind":"slide","id":"sl/nq1vnw","slide":9,"title":"TECHNOLOGY","textShapes":18}
+{"kind":"textbox","id":"sh/hczq1cvy","slide":9,"text":"TECHNOLOGY","textPreview":"TECHNOLOGY","textChars":10,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/u9o76xwn","slide":9,"text":"A deployable web platform with modular agent services","textPreview":"A deployable web platform with modular agent services","textChars":53,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/vah8z2ds","slide":9,"text":"The interface, API, data model, and planning logic remain separate so the product can grow safely.","textPreview":"The interface, API, data model, and planning logic remain separate so the product can grow safely.","textChars":98,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/876p4neh","slide":9,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/98fqxsv2","slide":9,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/m5o72xwb","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/76x8v2dw","slide":9,"bbox":[60,260,260,235]}
+{"kind":"textbox","id":"sh/kj6p0ne5","slide":9,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[83,286,45,17]}
+{"kind":"textbox","id":"sh/l4fqtsvq","slide":9,"text":"React + Vite","textPreview":"React + Vite","textChars":12,"textLines":1,"bbox":[83,323,205,27]}
+{"kind":"textbox","id":"sh/107uhc7m","slide":9,"text":"Responsive student interface\nProfessional icon system\nINR and USD display","textPreview":"Responsive student interface | Professional icon system | INR and USD display","textChars":73,"textLines":3,"bbox":[83,374,196,78]}
+{"kind":"shape","id":"sh/gzydo761","slide":9,"bbox":[350,260,260,235]}
+{"kind":"textbox","id":"sh/fypcf2pg","slide":9,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[373,286,45,17]}
+{"kind":"textbox","id":"sh/exwvmhov","slide":9,"text":"FastAPI","textPreview":"FastAPI","textChars":7,"textLines":1,"bbox":[373,323,205,27]}
+{"kind":"textbox","id":"sh/twnudc7a","slide":9,"text":"REST endpoints\nPydantic schemas\nProfile and planning APIs","textPreview":"REST endpoints | Pydantic schemas | Profile and planning APIs","textChars":57,"textLines":3,"bbox":[373,374,196,78]}
+{"kind":"shape","id":"sh/sbedk7qp","slide":9,"bbox":[640,260,260,235]}
+{"kind":"textbox","id":"sh/ra5cb2p4","slide":9,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[663,286,45,17]}
+{"kind":"textbox","id":"sh/69wvix8z","slide":9,"text":"Agent services","textPreview":"Agent services","textChars":14,"textLines":1,"bbox":[663,323,205,27]}
+{"kind":"textbox","id":"sh/58nu9s7e","slide":9,"text":"Discovery and eligibility\nFunding planner\nAutopilot and deadline logic","textPreview":"Discovery and eligibility | Funding planner | Autopilot and deadline logic","textChars":70,"textLines":3,"bbox":[663,374,196,78]}
+{"kind":"shape","id":"sh/47etgnqt","slide":9,"bbox":[930,260,260,235]}
+{"kind":"textbox","id":"sh/wrydwnyp","slide":9,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[953,286,45,17]}
+{"kind":"textbox","id":"sh/xcrupsfa","slide":9,"text":"SQLite","textPreview":"SQLite","textChars":6,"textLines":1,"bbox":[953,323,205,27]}
+{"kind":"textbox","id":"sh/apgvuxgj","slide":9,"text":"Account records\nStudent profiles\nApplication pipeline state","textPreview":"Account records | Student profiles | Application pipeline state","textChars":59,"textLines":3,"bbox":[953,374,196,78]}
+{"kind":"textbox","id":"sh/vqpcn2x4","slide":9,"text":"Frontend and backend deploy independently through a configured API URL.","textPreview":"Frontend and backend deploy independently through a configured API URL.","textChars":71,"textLines":1,"bbox":[60,564,950,24]}
+{"kind":"notes","id":"nt/nq1vnw","slide":9,"text":"Keep technical architecture short. Judges should know the stack supports the experience they saw."}
+{"kind":"slide","id":"sl/copthe","slide":10,"title":"LIVE DEMO","textShapes":22}
+{"kind":"textbox","id":"sh/pgzepg3q","slide":10,"text":"LIVE DEMO","textPreview":"LIVE DEMO","textChars":9,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/2dofe1kf","slide":10,"text":"A clear two-minute product walk-through","textPreview":"A clear two-minute product walk-through","textChars":39,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/3exwn6lk","slide":10,"text":"Start with the student's need, then show the plan and the protective controls.","textPreview":"Start with the student's need, then show the plan and the protective controls.","textChars":78,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/c3qxkb2h","slide":10,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/d4zetg32","slide":10,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/qh8filkb","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"textbox","id":"sh/rihwr6lw","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[75,240,22,20]}
+{"kind":"textbox","id":"sh/07qxov2d","slide":10,"text":"Register","textPreview":"Register","textChars":8,"textLines":1,"bbox":[126,239,145,22]}
+{"kind":"textbox","id":"sh/l8jyx0jy","slide":10,"text":"Create an account and open the profile builder.","textPreview":"Create an account and open the profile builder.","textChars":47,"textLines":1,"bbox":[318,241,760,22]}
+{"kind":"shape","id":"sh/9sb210jy","slide":10,"bbox":[75,278,1060,0]}
+{"kind":"textbox","id":"sh/or21svid","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[75,304,22,20]}
+{"kind":"textbox","id":"sh/nqtkzq1s","slide":10,"text":"Profile","textPreview":"Profile","textChars":7,"textLines":1,"bbox":[126,303,145,22]}
+{"kind":"textbox","id":"sh/mpkjql07","slide":10,"text":"Enter course, GPA, annual cost, confirmed aid, and achievements.","textPreview":"Enter course, GPA, annual cost, confirmed aid, and achievements.","textChars":64,"textLines":1,"bbox":[318,305,760,22]}
+{"kind":"shape","id":"sh/xgv25kju","slide":10,"bbox":[75,342,1060,0]}
+{"kind":"textbox","id":"sh/wv21wfi9","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[75,368,22,20]}
+{"kind":"textbox","id":"sh/butk3a1o","slide":10,"text":"Planner","textPreview":"Planner","textChars":7,"textLines":1,"bbox":[126,367,145,22]}
+{"kind":"textbox","id":"sh/atkju503","slide":10,"text":"Show the gap, ranked portfolio, confidence meter, and scenario controls.","textPreview":"Show the gap, ranked portfolio, confidence meter, and scenario controls.","textChars":72,"textLines":1,"bbox":[318,369,760,22]}
+{"kind":"shape","id":"sh/d0ritgjq","slide":10,"bbox":[75,406,1060,0]}
+{"kind":"textbox","id":"sh/czi1kb25","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[75,432,22,20]}
+{"kind":"textbox","id":"sh/43m10ba1","slide":10,"text":"Autopilot","textPreview":"Autopilot","textChars":9,"textLines":1,"bbox":[126,431,145,22]}
+{"kind":"textbox","id":"sh/54v29grm","slide":10,"text":"Open one opportunity, audit documents, and run the essay evidence check.","textPreview":"Open one opportunity, audit documents, and run the essay evidence check.","textChars":72,"textLines":1,"bbox":[318,433,760,22]}
+{"kind":"shape","id":"sh/i1kjylsv","slide":10,"bbox":[75,470,1060,0]}
+{"kind":"textbox","id":"sh/32dk769g","slide":10,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[75,496,22,20]}
+{"kind":"textbox","id":"sh/s7m14vax","slide":10,"text":"Pipeline","textPreview":"Pipeline","textChars":8,"textLines":1,"bbox":[126,495,145,22]}
+{"kind":"textbox","id":"sh/d8v2d0ri","slide":10,"text":"Show document reuse and any deadline collision before moving the card forward.","textPreview":"Show document reuse and any deadline collision before moving the card forward.","textChars":78,"textLines":1,"bbox":[318,497,760,22]}
+{"kind":"shape","id":"sh/q54j2lsr","slide":10,"bbox":[75,534,1060,0]}
+{"kind":"shape","id":"sh/r6dkbq9c","slide":10,"bbox":[75,583,126,27]}
+{"kind":"textbox","id":"sh/0b6l8vq9","slide":10,"text":"DEMO MESSAGE","textPreview":"DEMO MESSAGE","textChars":12,"textLines":1,"bbox":[83,590,110,13]}
+{"kind":"textbox","id":"sh/1wf2h0re","slide":10,"text":"The platform guides preparation. The student makes the final decision.","textPreview":"The platform guides preparation. The student makes the final decision.","textChars":70,"textLines":1,"bbox":[221,585,750,18]}
+{"kind":"notes","id":"nt/copthe","slide":10,"text":"This is a direct demo script, based on the user manual and working product."}
+{"kind":"slide","id":"sl/d1wuxl","slide":11,"title":"WHY IT MATTERS","textShapes":12}
+{"kind":"textbox","id":"sh/fatk76po","slide":11,"text":"WHY IT MATTERS","textPreview":"WHY IT MATTERS","textChars":14,"textLines":1,"bbox":[60,42,300,16]}
+{"kind":"textbox","id":"sh/gb2l0b69","slide":11,"text":"A better funding process gives students more control over scarce time","textPreview":"A better funding process gives students more control over scarce time","textChars":69,"textLines":1,"bbox":[60,75,1110,62]}
+{"kind":"textbox","id":"sh/1cb29g7u","slide":11,"text":"EduFund makes the next step visible before a deadline forces a rushed decision.","textPreview":"EduFund makes the next step visible before a deadline forces a rushed decision.","textChars":79,"textLines":1,"bbox":[60,145,1010,42]}
+{"kind":"shape","id":"sh/6503u1o7","slide":11,"bbox":[60,200,1160,0]}
+{"kind":"textbox","id":"sh/r69k36ps","slide":11,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/s7ilwb6d","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"shape","id":"sh/t8r25g7y","slide":11,"bbox":[60,255,1160,66]}
+{"kind":"textbox","id":"sh/a14365ob","slide":11,"text":"Students","textPreview":"Students","textChars":8,"textLines":1,"bbox":[91,276,180,21]}
+{"kind":"textbox","id":"sh/b2d4fqpw","slide":11,"text":"Understand the funding gap and the order of work.","textPreview":"Understand the funding gap and the order of work.","textChars":49,"textLines":1,"bbox":[340,276,760,21]}
+{"kind":"shape","id":"sh/v2x0ji9c","slide":11,"bbox":[60,345,1160,66]}
+{"kind":"textbox","id":"sh/u1ozadsr","slide":11,"text":"Advisors","textPreview":"Advisors","textChars":8,"textLines":1,"bbox":[91,366,180,21]}
+{"kind":"textbox","id":"sh/h4filsr2","slide":11,"text":"Review readiness through a shared plan rather than a scattered list.","textPreview":"Review readiness through a shared plan rather than a scattered list.","textChars":68,"textLines":1,"bbox":[340,366,760,21]}
+{"kind":"shape","id":"sh/g36hcnah","slide":11,"bbox":[60,435,1160,66]}
+{"kind":"textbox","id":"sh/36h0n298","slide":11,"text":"Institutions","textPreview":"Institutions","textChars":12,"textLines":1,"bbox":[91,456,180,21]}
+{"kind":"textbox","id":"sh/i58zexsn","slide":11,"text":"Point students to official sources and clearer requirements.","textPreview":"Point students to official sources and clearer requirements.","textChars":60,"textLines":1,"bbox":[340,456,760,21]}
+{"kind":"shape","id":"sh/58zipsre","slide":11,"bbox":[60,560,1160,48]}
+{"kind":"textbox","id":"sh/47qhgnat","slide":11,"text":"Provider rules and award decisions remain authoritative.","textPreview":"Provider rules and award decisions remain authoritative.","textChars":56,"textLines":1,"bbox":[89,575,800,18]}
+{"kind":"notes","id":"nt/d1wuxl","slide":11,"text":"Do not claim outcomes that have not been measured. The value is the transparency and actionability of the workflow."}
+{"kind":"slide","id":"sl/2oa1wl","slide":12,"title":"EDUFUND","textShapes":8}
+{"kind":"shape","id":"sh/onq1crep","slide":12,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/nmh0jmx4","slide":12,"bbox":[810,74,354,354]}
+{"kind":"shape","id":"sh/2l8jahwj","slide":12,"bbox":[860,124,254,254]}
+{"kind":"shape","id":"sh/xcj2pwf6","slide":12,"bbox":[910,174,154,154]}
+{"kind":"textbox","id":"sh/wba1gbel","slide":12,"text":"EDUFUND","textPreview":"EDUFUND","textChars":7,"textLines":1,"bbox":[62,70,230,17]}
+{"kind":"textbox","id":"sh/bq1kn6xg","slide":12,"text":"A funding plan\nshould create momentum.","textPreview":"A funding plan | should create momentum.","textChars":38,"textLines":2,"bbox":[62,177,665,118]}
+{"kind":"textbox","id":"sh/ap8je1wv","slide":12,"text":"Discover relevant opportunities. Understand the gap. Prepare each application with evidence and care.","textPreview":"Discover relevant opportunities. Understand the gap. Prepare each application with evidence and care.","textChars":101,"textLines":1,"bbox":[62,340,600,64]}
+{"kind":"shape","id":"sh/lgj2tgfi","slide":12,"bbox":[62,468,112,27]}
+{"kind":"textbox","id":"sh/kfa1kbex","slide":12,"text":"THANK YOU","textPreview":"THANK YOU","textChars":9,"textLines":1,"bbox":[70,475,96,13]}
+{"kind":"textbox","id":"sh/ipsvyd4z","slide":12,"text":"Live product demonstration available","textPreview":"Live product demonstration available","textChars":36,"textLines":1,"bbox":[62,524,320,20]}
+{"kind":"textbox","id":"sh/3q1wri5k","slide":12,"text":"The student stays in control.","textPreview":"The student stays in control.","textChars":29,"textLines":1,"bbox":[62,640,400,18]}
+{"kind":"textbox","id":"sh/4rud0nm5","slide":12,"text":"EDUFUND  /  HACKATHON 2026","textPreview":"EDUFUND  /  HACKATHON 2026","textChars":26,"textLines":1,"bbox":[58,680,260,15]}
+{"kind":"textbox","id":"sh/5s3etsnq","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1175,680,46,15]}
+{"kind":"notes","id":"nt/2oa1wl","slide":12,"text":"Invite judges to see the live product and repeat the human-control promise."}

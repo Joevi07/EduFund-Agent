@@ -146,7 +146,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
             )}
 
             {/* Document Auditor Widget */}
-            <div className="bento-box">
+            <div className="bento-box form-bento">
               <DocumentAuditorWidget 
                 opportunityId={oppId}
                 requiredDocuments={selectedOpportunity?.required_documents}

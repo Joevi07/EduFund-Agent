@@ -151,8 +151,19 @@ def discover_for_profile(request: DiscoveryRequest):
 
 @app.get("/api/opportunities", response_model=List[Opportunity])
 def list_opportunities(category: Optional[str] = None, q: Optional[str] = None):
-    default_prof = StudentProfile()
-    return discovery_agent.discover(default_prof, category_filter=category, search_query=q)
+    opps = get_all_opportunities()
+    if category and category.lower() != "all":
+        opps = [opp for opp in opps if opp.category.lower() == category.lower()]
+    if q:
+        needle = q.lower()
+        opps = [
+            opp for opp in opps
+            if needle in opp.title.lower()
+            or needle in opp.provider.lower()
+            or needle in opp.description.lower()
+            or any(needle in course.lower() for course in opp.target_courses)
+        ]
+    return opps
 
 @app.get("/api/opportunities/{opp_id}", response_model=Opportunity)
 def get_opportunity(opp_id: str):

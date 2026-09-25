@@ -311,6 +311,7 @@ const FALLBACK_OPPORTUNITIES = [
     max_family_income_inr: 600000,
     description: "Merit-cum-means scholarship for high-performing STEM students.",
     required_documents: ["10th & 12th Marksheets", "Income Certificate"],
+    location_restrictions: ["India"],
     essay_prompts: ["Describe how your STEM field contributes to socio-economic challenges."],
     urgency: "HIGH"
   },
@@ -329,6 +330,7 @@ const FALLBACK_OPPORTUNITIES = [
     max_family_income_inr: 800000,
     description: "100% tuition fee waiver for economically weaker meritorious students.",
     required_documents: ["Family Income Proof", "State Merit Rank Card"],
+    location_restrictions: ["India"],
     essay_prompts: ["Explain your financial background and fee waiver impact."],
     urgency: "HIGH"
   },
@@ -347,6 +349,7 @@ const FALLBACK_OPPORTUNITIES = [
     max_family_income_inr: 1200000,
     description: "Empowering computer science students demonstrating leadership in tech.",
     required_documents: ["Resume/CV", "Official Transcript", "Letter of Recommendation"],
+    location_restrictions: ["Global"],
     essay_prompts: ["Describe a time you demonstrated leadership in tech."],
     urgency: "MEDIUM"
   }

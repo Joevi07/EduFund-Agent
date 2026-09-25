@@ -1,140 +1,38 @@
-import React, { useState } from "react";
-import { User, DollarSign, Save, MapPin, Award, CheckCircle2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { User, DollarSign, Save, MapPin, Award, CheckCircle2, Plus, X } from "lucide-react";
 
-const Section = ({ icon: Icon, title, color = "var(--accent-teal)", children }) => (
-  <div className="bento-box" style={{ padding:"1.8rem" }}>
-    <h3 style={{ fontSize:"1rem", fontWeight:700, marginBottom:"1.2rem", display:"flex", alignItems:"center", gap:".55rem" }}>
-      <div style={{ background:`linear-gradient(135deg,${color},${color}cc)`, borderRadius:8, padding:6, boxShadow:`0 3px 10px ${color}40`, display:"flex" }}>
-        <Icon size={16} color="#fff"/>
-      </div>
-      {title}
-    </h3>
-    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))", gap:"1rem" }}>
-      {children}
-    </div>
-  </div>
-);
+const ISO_COUNTRY_CODES = "AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI CV KH CM CA CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG MK NO OM PK PW PA PG PY PE PH PL PT QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA SS ES LK SD SR SE CH SY TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW".split(" ");
+const COUNTRIES = (() => { try { const names = new Intl.DisplayNames(["en"], { type:"region" }); return ISO_COUNTRY_CODES.map(code => names.of(code)).filter(Boolean).sort(); } catch { return ["India", "United States", "United Kingdom", "Canada", "Australia", "Other"]; } })();
+const REGIONS = {
+  India:["Andhra Pradesh","Assam","Bihar","Delhi","Gujarat","Karnataka","Kerala","Maharashtra","Rajasthan","Tamil Nadu","Telangana","Uttar Pradesh","West Bengal"],
+  "United States":["California","Illinois","Massachusetts","New York","Texas","Washington"],
+  Canada:["Alberta","British Columbia","Ontario","Quebec"],
+  "United Kingdom":["England","Northern Ireland","Scotland","Wales"],
+  Australia:["New South Wales","Queensland","Victoria","Western Australia"],
+};
+const CITIES = { Karnataka:["Bengaluru","Mysuru","Mangaluru","Hubballi"], Maharashtra:["Mumbai","Pune","Nagpur","Nashik"], "Tamil Nadu":["Chennai","Coimbatore","Madurai"], Telangana:["Hyderabad","Warangal"], Delhi:["New Delhi"], Kerala:["Kochi","Thiruvananthapuram"], California:["Los Angeles","San Diego","San Francisco"], "New York":["New York City","Buffalo"], Ontario:["Toronto","Ottawa","Waterloo"], England:["London","Manchester","Birmingham"], Victoria:["Melbourne","Geelong"] };
 
-const Field = ({ label, children }) => (
-  <div>
-    <label style={{ display:"block", fontSize:".78rem", fontWeight:600, color:"var(--text-secondary)", marginBottom:".4rem", letterSpacing:".02em" }}>
-      {label}
-    </label>
-    {children}
-  </div>
-);
+const Section = ({ icon: Icon, title, color="var(--accent-teal)", children }) => <section className="bento-box" style={{padding:"1.8rem"}}><h3 style={{fontSize:"1rem",fontWeight:700,marginBottom:"1.2rem",display:"flex",alignItems:"center",gap:".55rem"}}><span style={{background:`linear-gradient(135deg,${color},${color}cc)`,borderRadius:8,padding:6,display:"flex"}}><Icon size={16} color="#fff"/></span>{title}</h3><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",gap:"1rem"}}>{children}</div></section>;
+const Field = ({label,hint,children}) => <div><label style={{display:"block",fontSize:".78rem",fontWeight:700,color:"var(--text-secondary)",marginBottom:".4rem"}}>{label}</label>{children}{hint&&<small style={{display:"block",color:"var(--text-muted)",marginTop:".35rem",fontSize:".7rem"}}>{hint}</small>}</div>;
+function TagEditor({label,values=[],onChange,placeholder}) { const [draft,setDraft]=useState(""); const add=()=>{const next=draft.trim(); if(next&&!values.some(v=>v.toLowerCase()===next.toLowerCase()))onChange([...values,next]);setDraft("");}; return <Field label={label} hint="Add one item at a time. Press Enter or choose Add."><div className="tag-editor"><div className="tag-list">{values.map((value,index)=><span className="profile-tag" key={`${value}-${index}`}>{value}<button type="button" aria-label={`Remove ${value}`} onClick={()=>onChange(values.filter((_,i)=>i!==index))}><X size={12}/></button></span>)}</div><div className="tag-entry"><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();add();}}} placeholder={placeholder}/><button type="button" className="btn-secondary" onClick={add}><Plus size={15}/>Add</button></div></div></Field>; }
 
-export default function ProfileBuilderView({ profile, setProfile, onSaveProfile }) {
-  const [formData, setFormData] = useState(profile);
-  const [saved,    setSaved]    = useState(false);
-
-  const set    = (field, val)         => setFormData(p => ({ ...p, [field]: val }));
-  const setNested = (parent, field, val) => setFormData(p => ({ ...p, [parent]: { ...p[parent], [field]: val } }));
-
-  const submit = async e => {
-    e.preventDefault();
-    setProfile(formData);
-    await onSaveProfile(formData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
-
-  return (
-    <div style={{ maxWidth:1000, margin:"0 auto" }}>
-      <div style={{ marginBottom:"1.5rem" }}>
-        <h2 style={{ fontSize:"1.55rem", fontWeight:800, letterSpacing:"-.035em" }}>Profile Agent Config</h2>
-        <p style={{ color:"var(--text-secondary)", fontSize:".88rem", marginTop:".2rem" }}>
-          Update your credentials and financial details to refine AI eligibility reasoning & gap calculation.
-        </p>
-      </div>
-
-      <form onSubmit={submit} style={{ display:"flex", flexDirection:"column", gap:"1.4rem" }}>
-
-        {/* Academic */}
-        <Section icon={User} title="Academic & Personal Background">
-          <Field label="Full Name">
-            <input value={formData.name} onChange={e => set("name", e.target.value)} required placeholder="Your full name"/>
-          </Field>
-          <Field label="Education Level">
-            <select value={formData.education_level} onChange={e => set("education_level", e.target.value)}>
-              <option value="High School">High School Senior</option>
-              <option value="Undergraduate">Undergraduate (B.Tech / B.S / B.A)</option>
-              <option value="Master's">Master's (M.Tech / M.S / MBA)</option>
-              <option value="PhD">PhD / Doctorate</option>
-            </select>
-          </Field>
-          <Field label="Field of Study / Course">
-            <input value={formData.course} onChange={e => set("course", e.target.value)} required placeholder="e.g. Computer Science & AI"/>
-          </Field>
-          <Field label="Current GPA">
-            <input type="number" step=".01" max="4.0" value={formData.academic_profile?.gpa}
-              onChange={e => setNested("academic_profile","gpa", parseFloat(e.target.value)||0)} required placeholder="3.8"/>
-          </Field>
-          <Field label="Standardized Test / Rank">
-            <input value={formData.academic_profile?.standardized_test}
-              onChange={e => setNested("academic_profile","standardized_test", e.target.value)} placeholder="e.g. SAT 1480 / JEE 98.5th"/>
-          </Field>
-          <Field label="Year of Study">
-            <input value={formData.academic_profile?.year_of_study}
-              onChange={e => setNested("academic_profile","year_of_study", e.target.value)} placeholder="e.g. 2nd Year"/>
-          </Field>
-        </Section>
-
-        {/* Location */}
-        <Section icon={MapPin} title="Location" color="var(--accent-indigo)">
-          <Field label="City">
-            <input value={formData.location?.city} onChange={e => setNested("location","city", e.target.value)} placeholder="Bengaluru"/>
-          </Field>
-          <Field label="State">
-            <input value={formData.location?.state} onChange={e => setNested("location","state", e.target.value)} placeholder="Karnataka"/>
-          </Field>
-          <Field label="Country">
-            <input value={formData.location?.country} onChange={e => setNested("location","country", e.target.value)} placeholder="India"/>
-          </Field>
-        </Section>
-
-        {/* Financial */}
-        <Section icon={DollarSign} title="Financial Constraints & Budget" color="var(--accent-sage)">
-          <Field label="Target Annual Education Cost (₹ INR)">
-            <input type="number" value={formData.financial_constraints?.target_annual_cost_inr}
-              onChange={e => setNested("financial_constraints","target_annual_cost_inr", parseFloat(e.target.value)||0)} required placeholder="120000"/>
-          </Field>
-          <Field label="Confirmed Aid / Family Support (₹ INR)">
-            <input type="number" value={formData.financial_constraints?.confirmed_aid_inr}
-              onChange={e => setNested("financial_constraints","confirmed_aid_inr", parseFloat(e.target.value)||0)} required placeholder="60000"/>
-          </Field>
-          <Field label="Annual Family Income (₹ INR)">
-            <input type="number" value={formData.financial_constraints?.annual_family_income_inr}
-              onChange={e => setNested("financial_constraints","annual_family_income_inr", parseFloat(e.target.value)||0)} required placeholder="450000"/>
-          </Field>
-        </Section>
-
-        {/* Achievements */}
-        <Section icon={Award} title="Achievements & Interests" color="var(--amber-500)">
-          <Field label="Achievements (comma-separated)">
-            <input value={(formData.achievements||[]).join(", ")}
-              onChange={e => set("achievements", e.target.value.split(",").map(s=>s.trim()).filter(Boolean))}
-              placeholder="National Hackathon Winner, Published Paper…"/>
-          </Field>
-          <Field label="Interests / Skills (comma-separated)">
-            <input value={(formData.interests||[]).join(", ")}
-              onChange={e => set("interests", e.target.value.split(",").map(s=>s.trim()).filter(Boolean))}
-              placeholder="Artificial Intelligence, FinTech…"/>
-          </Field>
-        </Section>
-
-        {/* Save button */}
-        <div style={{ display:"flex", alignItems:"center", gap:"1rem" }}>
-          <button type="submit" className="btn-emerald" style={{ padding:".8rem 1.8rem", fontSize:".95rem" }}>
-            <Save size={17}/> Save Profile & Recalculate Strategy
-          </button>
-          {saved && (
-            <span style={{ color:"var(--accent-sage)", fontSize:".88rem", fontWeight:700 }}>
-              <CheckCircle2 size={16} style={{ verticalAlign:"middle", marginRight:".3rem" }}/>Saved! Strategy recalculated.
-            </span>
-          )}
-        </div>
-      </form>
-    </div>
-  );
+export default function ProfileBuilderView({profile,setProfile,onSaveProfile}) {
+  const [form,setForm]=useState(profile),[saved,setSaved]=useState(false),[error,setError]=useState("");
+  useEffect(()=>setForm(profile),[profile]);
+  const set=(key,value)=>setForm(current=>({...current,[key]:value}));
+  const nested=(parent,key,value)=>setForm(current=>({...current,[parent]:{...current[parent],[key]:value}}));
+  const max=Number(form.academic_profile?.max_gpa)||10;
+  const changeScale=value=>{const next=Number(value);setForm(current=>({...current,academic_profile:{...current.academic_profile,max_gpa:next,gpa:Math.min(Number(current.academic_profile?.gpa)||0,next)}}));};
+  const changeGpa=value=>{if(value==="")return nested("academic_profile","gpa","");const num=Number(value);if(Number.isFinite(num)&&num>=0&&num<=max)nested("academic_profile","gpa",num);};
+  const changeCountry=value=>setForm(current=>({...current,location:{...current.location,country:value,state:"",city:""}}));
+  const changeRegion=value=>setForm(current=>({...current,location:{...current.location,state:value,city:""}}));
+  const regions=REGIONS[form.location?.country]||[], cities=CITIES[form.location?.state]||[];
+  const submit=async event=>{event.preventDefault();setError("");const gpa=Number(form.academic_profile?.gpa);if(!Number.isFinite(gpa)||gpa<0||gpa>max)return setError(`Enter CGPA between 0.00 and ${max.toFixed(2)}.`);if(!form.location?.country||!form.location?.state||!form.location?.city)return setError("Complete country, state or region, and city before saving.");setProfile(form);await onSaveProfile(form);setSaved(true);setTimeout(()=>setSaved(false),3000);};
+  return <div style={{maxWidth:1000,margin:"0 auto"}}><div style={{marginBottom:"1.5rem"}}><h2 style={{fontSize:"1.55rem",fontWeight:800,letterSpacing:"-.035em"}}>Profile Agent</h2><p style={{color:"var(--text-secondary)",fontSize:".88rem",marginTop:".2rem"}}>Complete your profile to personalize eligibility, planning, and application support.</p></div><form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:"1.4rem"}}>
+    <Section icon={User} title="Academic background"><Field label="Full name"><input value={form.name||""} onChange={e=>set("name",e.target.value)} required placeholder="Your full name"/></Field><Field label="Education level"><select value={form.education_level||""} onChange={e=>set("education_level",e.target.value)}><option value="High School">High School</option><option value="Undergraduate">Undergraduate</option><option value="Master's">Master's</option><option value="PhD">PhD / Doctorate</option></select></Field><Field label="Field of study"><input value={form.course||""} onChange={e=>set("course",e.target.value)} required placeholder="e.g. Computer Science & AI"/></Field><Field label="CGPA scale"><select value={max} onChange={e=>changeScale(e.target.value)}><option value="4">Out of 4.00</option><option value="5">Out of 5.00</option><option value="10">Out of 10.00</option></select></Field><Field label={`Current CGPA (out of ${max.toFixed(2)})`} hint="Decimals are accepted, for example 8.40, 4.20, or 3.80."><input type="number" inputMode="decimal" step="0.01" min="0" max={max} value={form.academic_profile?.gpa??""} onChange={e=>changeGpa(e.target.value)} required placeholder={max===10?"8.40":"3.80"}/></Field><Field label="Standardized test or rank"><input value={form.academic_profile?.standardized_test||""} onChange={e=>nested("academic_profile","standardized_test",e.target.value)} placeholder="e.g. JEE Main 96 percentile"/></Field><Field label="Year of study"><select value={form.academic_profile?.year_of_study||""} onChange={e=>nested("academic_profile","year_of_study",e.target.value)}><option value="">Select year</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>Final Year</option></select></Field></Section>
+    <Section icon={MapPin} title="Global location" color="var(--accent-indigo)"><Field label="Country"><select value={form.location?.country||""} onChange={e=>changeCountry(e.target.value)}><option value="">Select country</option>{COUNTRIES.map(country=><option key={country}>{country}</option>)}</select></Field><Field label="State, province, or region">{regions.length?<select value={form.location?.state||""} onChange={e=>changeRegion(e.target.value)}><option value="">Select state or region</option>{regions.map(region=><option key={region}>{region}</option>)}</select>:<input value={form.location?.state||""} onChange={e=>nested("location","state",e.target.value)} placeholder="Enter state, province, or region"/>}</Field><Field label="City">{cities.length?<select value={form.location?.city||""} onChange={e=>nested("location","city",e.target.value)} disabled={!form.location?.state}><option value="">{form.location?.state?"Select city":"Choose region first"}</option>{cities.map(city=><option key={city}>{city}</option>)}</select>:<input value={form.location?.city||""} onChange={e=>nested("location","city",e.target.value)} placeholder="Enter city"/>}</Field></Section>
+    <Section icon={DollarSign} title="Funding need" color="var(--accent-sage)"><Field label="Target annual education cost (INR)"><input type="number" min="0" step="1000" value={form.financial_constraints?.target_annual_cost_inr??""} onChange={e=>nested("financial_constraints","target_annual_cost_inr",Number(e.target.value)||0)} required/></Field><Field label="Confirmed aid or family support (INR)"><input type="number" min="0" step="1000" value={form.financial_constraints?.confirmed_aid_inr??""} onChange={e=>nested("financial_constraints","confirmed_aid_inr",Number(e.target.value)||0)} required/></Field><Field label="Annual family income (INR)"><input type="number" min="0" step="1000" value={form.financial_constraints?.annual_family_income_inr??""} onChange={e=>nested("financial_constraints","annual_family_income_inr",Number(e.target.value)||0)} required/></Field></Section>
+    <Section icon={Award} title="Achievements and interests" color="var(--amber-500)"><TagEditor label="Achievements" values={form.achievements} onChange={values=>set("achievements",values)} placeholder="e.g. College hackathon finalist"/><TagEditor label="Interests and skills" values={form.interests} onChange={values=>set("interests",values)} placeholder="e.g. Machine Learning"/></Section>
+    {error&&<div className="auth-error">{error}</div>}<div style={{display:"flex",alignItems:"center",gap:"1rem"}}><button type="submit" className="btn-emerald" style={{padding:".8rem 1.8rem",fontSize:".95rem"}}><Save size={17}/>Save profile and recalculate</button>{saved&&<span style={{color:"var(--accent-sage)",fontSize:".88rem",fontWeight:700}}><CheckCircle2 size={16} style={{verticalAlign:"middle",marginRight:".3rem"}}/>Profile saved. Strategy recalculated.</span>}</div>
+  </form></div>;
 }

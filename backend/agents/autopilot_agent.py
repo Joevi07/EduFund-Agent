@@ -46,9 +46,11 @@ class AutopilotAgent:
         achievements_str = ", ".join(profile.achievements)
         interests_str = ", ".join(profile.interests)
 
+        gpa_value = profile.academic_profile.get("gpa", 3.8)
+        gpa_scale = profile.academic_profile.get("max_gpa", 4.0)
         draft = (
             f"As a dedicated {profile.education_level} student specializing in {profile.course} with a GPA of "
-            f"{profile.academic_profile.get('gpa', 3.8)}/4.0, I am writing to apply for the {opp.title}.\n\n"
+            f"{gpa_value}/{gpa_scale}, I am writing to apply for the {opp.title}.\n\n"
             f"My academic journey is driven by a deep passion for {interests_str}. Throughout my studies, I have consistently "
             f"striven for excellence, as demonstrated by my key achievements including: {achievements_str}.\n\n"
             f"Receiving the {opp.title} from {opp.provider} would provide vital support for my target educational expenses "

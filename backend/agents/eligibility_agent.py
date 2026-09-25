@@ -29,13 +29,15 @@ class EligibilityAgent:
             ))
 
         # 2. Academic / GPA Check
-        student_gpa = profile.academic_profile.get("gpa", 0.0)
+        raw_gpa = float(profile.academic_profile.get("gpa", 0.0) or 0.0)
+        max_gpa = float(profile.academic_profile.get("max_gpa", 4.0) or 4.0)
+        student_gpa = round((raw_gpa / max_gpa) * 4.0, 2) if max_gpa else raw_gpa
         if opp.min_gpa is not None:
             if student_gpa >= opp.min_gpa:
                 checks.append(EligibilityCheck(
                     criterion="Academic Requirement",
                     status="PASS",
-                    detail=f"Student GPA ({student_gpa}) meets minimum required ({opp.min_gpa})."
+                    detail=f"Student CGPA ({raw_gpa}/{max_gpa} ≈ {student_gpa}/4.0) meets minimum required ({opp.min_gpa})."
                 ))
             else:
                 score -= 25
@@ -43,7 +45,7 @@ class EligibilityAgent:
                 checks.append(EligibilityCheck(
                     criterion="Academic Requirement",
                     status="FAIL",
-                    detail=f"Student GPA ({student_gpa}) is below minimum requirement ({opp.min_gpa})."
+                    detail=f"Student CGPA ({raw_gpa}/{max_gpa} ≈ {student_gpa}/4.0) is below minimum requirement ({opp.min_gpa})."
                 ))
         else:
             checks.append(EligibilityCheck(

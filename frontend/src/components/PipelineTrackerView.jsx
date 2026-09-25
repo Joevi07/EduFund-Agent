@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Kanban, Clock, AlertTriangle, ChevronRight, FileStack, CalendarRange, CheckCircle2 } from "lucide-react";
-import { fetchDeadlines } from "../services/api";
+import { fetchDeadlines, fetchOpportunities } from "../services/api";
 
 const COLUMNS = [
   { id:"DISCOVERED",      label:"Discovered",        badge:"badge-teal",   next:"PLANNED"          },
@@ -18,31 +18,41 @@ const COL_COLORS = {
   SUBMITTED:       "rgba(41,165,87,.12)",
 };
 
-const canonicalDocument = (document) => {
-  const value = document.toLowerCase();
-  if (value.includes("income") || value.includes("salary")) return "Income proof";
-  if (value.includes("mark") || value.includes("transcript")) return "Academic records";
-  if (value.includes("bank")) return "Bank details";
-  if (value.includes("admission") || value.includes("bonafide") || value.includes("enrollment")) return "Enrollment proof";
-  if (value.includes("aadhaar") || value.includes("identity") || value.includes("government id")) return "Government ID";
-  return document;
-};
+const canonicalDocument = (document) => document;
 
 export default function PipelineTrackerView({ opportunities, currency, applications = [], plan, onUpdateStatus }) {
   const isINR = currency === "INR";
   const fmt   = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
   const [deadlineData, setDeadlineData] = useState(null);
+  const [catalogue, setCatalogue] = useState(opportunities);
 
   useEffect(() => { fetchDeadlines().then(setDeadlineData); }, []);
+  useEffect(() => {
+    fetchOpportunities("All", "").then((all) => {
+      if (Array.isArray(all) && all.length) setCatalogue(all);
+    }).catch(() => setCatalogue(opportunities));
+  }, [opportunities]);
 
   const getColItems = (colId) =>
     opportunities.filter(o => (applications.find(a => a.opportunity_id === o.id)?.status || "DISCOVERED") === colId);
   const activeIds = new Set([...(applications || []).map(app => app.opportunity_id), ...(plan?.recommended_strategy || []).map(item => item.opportunity_id)]);
   const workspaceOpportunities = opportunities.filter(opp => activeIds.has(opp.id));
-  const documentUse = workspaceOpportunities.flatMap(opp => (opp.required_documents || []).map(document => ({ document:canonicalDocument(document), title:opp.title }))).reduce((map, item) => {
-    map[item.document] = map[item.document] || []; map[item.document].push(item.title); return map;
+  const countryLabel = (opp) => {
+    const locs = opp.location_restrictions || [];
+    if (!locs.length || locs.some(loc => String(loc).toLowerCase() === "global")) return "Worldwide";
+    return locs.join(", ");
+  };
+  const sourceOpportunities = (catalogue && catalogue.length ? catalogue : opportunities) || [];
+  const documentUse = sourceOpportunities.flatMap(opp => (opp.required_documents || []).map(document => ({
+    document: canonicalDocument(document),
+    title: opp.title,
+    country: countryLabel(opp)
+  }))).reduce((map, item) => {
+    map[item.document] = map[item.document] || [];
+    map[item.document].push(item);
+    return map;
   }, {});
-  const reusableDocuments = Object.entries(documentUse).filter(([, titles]) => titles.length > 1).sort((a,b) => b[1].length - a[1].length);
+  const reusableDocuments = Object.entries(documentUse).sort((a,b) => b[1].length - a[1].length);
   const upcoming = workspaceOpportunities.filter(opp => opp.days_left >= 0 && opp.days_left <= 30).sort((a,b) => a.days_left - b.days_left);
   const collisions = upcoming.filter((opp, index) => upcoming.some((other, otherIndex) => otherIndex !== index && Math.abs(other.days_left - opp.days_left) <= 7));
 
@@ -82,8 +92,18 @@ export default function PipelineTrackerView({ opportunities, currency, applicati
 
       <div className="pipeline-intelligence">
         <section className="bento-box intelligence-card">
-          <div className="intelligence-title"><FileStack size={18}/><div><h3>Document Reuse Map</h3><p>Prepare once, reuse across your active strategy stack.</p></div></div>
-          {reusableDocuments.length ? <div className="reuse-list">{reusableDocuments.map(([document, titles]) => <div key={document}><strong>{document}</strong><span>{titles.length} applications</span><small>{titles.slice(0,2).join(" · ")}{titles.length > 2 ? ` +${titles.length - 2}` : ""}</small></div>)}</div> : <div className="intelligence-empty"><CheckCircle2 size={17}/>Add opportunities to your strategy stack to identify reusable documents.</div>}
+          <div className="intelligence-title"><FileStack size={18}/><div><h3>Document Reuse Map</h3><p>Every required document across the worldwide catalogue, with all countries shown.</p></div></div>
+          {reusableDocuments.length ? <div className="reuse-list">{reusableDocuments.map(([document, entries]) => {
+            const countries = Array.from(new Set(entries.map(item => item.country)));
+            return (
+              <div key={document}>
+                <strong>{document}</strong>
+                <span>{entries.length} applications · {countries.length} {countries.length === 1 ? "region" : "regions"}</span>
+                <div className="reuse-countries">{countries.map(country => <em key={country}>{country}</em>)}</div>
+                <div className="reuse-apps">{entries.map((item, index) => <small key={`${item.title}-${index}`}>{item.title}<em>{item.country}</em></small>)}</div>
+              </div>
+            );
+          })}</div> : <div className="intelligence-empty"><CheckCircle2 size={17}/>No catalogue documents yet. Once opportunities load, every reusable document and country will appear here.</div>}
         </section>
         <section className="bento-box intelligence-card">
           <div className="intelligence-title"><CalendarRange size={18}/><div><h3>Deadline Collision Detector</h3><p>Find active applications with deadlines within seven days of each other.</p></div></div>

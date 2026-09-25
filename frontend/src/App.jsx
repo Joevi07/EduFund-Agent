@@ -28,8 +28,8 @@ const INITIAL_PROFILE = {
   education_level: "Undergraduate",
   course: "Computer Science & AI",
   academic_profile: {
-    gpa: 3.8,
-    max_gpa: 4.0,
+    gpa: 8.5,
+    max_gpa: 10,
     standardized_test: "SAT 1480 / JEE Main 98.5th Percentile",
     year_of_study: "2nd Year"
   },
@@ -113,7 +113,7 @@ export default function App() {
       let activeProfile = profile;
       if (auth) {
         const stored = await fetchMyProfile(auth.token).catch(() => null);
-        activeProfile = stored || { ...INITIAL_PROFILE, id: auth.user.id, name: auth.user.name, course: "", interests: [], achievements: [], academic_profile: { gpa: 0, max_gpa: 4, standardized_test: "", year_of_study: "" }, location: { country: "India", state: "", city: "", study_destination: "India" }, financial_constraints: { annual_family_income_inr: 0, target_annual_cost_inr: 0, confirmed_aid_inr: 0, currency: "INR" } };
+        activeProfile = stored || { ...INITIAL_PROFILE, id: auth.user.id, name: auth.user.name, course: "", interests: [], achievements: [], academic_profile: { gpa: 0, max_gpa: 10, standardized_test: "", year_of_study: "" }, location: { country: "India", state: "", city: "", study_destination: "" }, financial_constraints: { annual_family_income_inr: 0, target_annual_cost_inr: 0, confirmed_aid_inr: 0, currency: "INR" } };
         setProfile(activeProfile);
       }
       const opps = await fetchOpportunities("All", "", activeProfile);
