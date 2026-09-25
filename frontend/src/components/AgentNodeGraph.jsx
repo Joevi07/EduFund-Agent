@@ -32,8 +32,10 @@ export default function AgentNodeGraph({ onSelectAgentNode }) {
           const Icon = node.icon;
           const isSelected = activeNode === node.id;
           return (
-            <div
+            <button
               key={node.id}
+              type="button"
+              aria-label={`Open ${node.title}`}
               className={`agent-node ${isSelected ? "active" : ""}`}
               onClick={() => {
                 setActiveNode(node.id);
@@ -62,7 +64,7 @@ export default function AgentNodeGraph({ onSelectAgentNode }) {
                   {node.desc}
                 </div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

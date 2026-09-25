@@ -133,7 +133,17 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
 
         {/* Agent graph */}
         <div className="bento-box col-span-8">
-          <AgentNodeGraph onSelectAgentNode={(id) => console.log("node:", id)}/>
+          <AgentNodeGraph onSelectAgentNode={(id) => {
+            const destinations = {
+              profile: "profile",
+              discovery: "discovery",
+              eligibility: "discovery",
+              planner: "planner",
+              autopilot: "autopilot",
+              deadline: "pipeline",
+            };
+            onNavigate(destinations[id] || "dashboard");
+          }}/>
         </div>
 
         {/* Strategy Simulator */}

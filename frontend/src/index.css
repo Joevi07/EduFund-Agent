@@ -441,6 +441,7 @@ a { color: var(--accent-teal); }
   cursor: pointer;
   transition: all .2s ease;
   display: flex; align-items: center; gap: .6rem;
+  width: 100%; text-align: left; font-family: var(--font-main);
 }
 .agent-node:hover, .agent-node.active {
   border-color: var(--glass-border-teal);
