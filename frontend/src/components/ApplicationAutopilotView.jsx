@@ -105,7 +105,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
           <h2 style={{ fontSize: "1.55rem", fontWeight: 800, letterSpacing:"-.035em" }}>AI Application Autopilot Studio</h2>
         </div>
         <p style={{ color: "var(--text-secondary)", fontSize: ".88rem", marginLeft:"2.5rem" }}>
-          Extracts requirements, audits documents, refines essays with AI tone modifiers, and enforces human safety review.
+          Extracts requirements, checks document-list readiness, refines essays with AI tone modifiers, and enforces human safety review.
         </p>
       </div>
 
@@ -129,7 +129,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
           gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
           gap: "1.5rem"
         }}>
-          {/* Left Column: Document Auditor & Requirements */}
+          {/* Left Column: Document Readiness & Requirements */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {/* Missing Information Alert */}
             {autopilotData?.missing_information?.length > 0 && (
@@ -145,7 +145,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
               </div>
             )}
 
-            {/* Document Auditor Widget */}
+            {/* Document Readiness Widget */}
             <div className="bento-box form-bento">
               <DocumentAuditorWidget 
                 opportunityId={oppId}

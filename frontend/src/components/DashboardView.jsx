@@ -29,8 +29,9 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
       title: opp.title,
       priority_rank: index + 1,
       match_score: null,
-      expected_value_inr: opp.amount_inr,
-      expected_value_usd: opp.amount_usd,
+      amount_inr: opp.amount_inr,
+      amount_usd: opp.amount_usd,
+      application_priority_score: null,
       urgency: opp.urgency || "MEDIUM",
       fallback: true,
     }));
@@ -51,8 +52,8 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
   const LOG_TYPES    = ["All", "Profile", "Discovery", "Eligibility", "Planner", "Autopilot"];
 
   const alertText = covPct >= 100
-    ? `Your current strategy covers the full funding gap based on expected-value estimates.`
-    : `Agentic loop found ${stratCount} opportunities covering ${covPct}% of your funding gap.`;
+    ? `Listed awards in your current strategy could cover the funding gap; awards are not guaranteed.`
+    : `The priority strategy contains ${stratCount} opportunities with ${covPct}% potential coverage from listed award amounts.`;
 
   // Block card data using real counts
   const blockCards = [
@@ -197,7 +198,8 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
                   </div>
                   <div style={{ fontSize:".9rem", fontWeight:700, color:"var(--text-primary)" }}>{item.title}</div>
                   <div style={{ fontSize:".76rem", color:"var(--text-muted)", marginTop:".12rem" }}>
-                    EV Coverage: <strong style={{ color:"var(--accent-sage)" }}>{fmt(item.expected_value_inr, item.expected_value_usd)}</strong>
+                    Award: <strong style={{ color:"var(--accent-sage)" }}>{fmt(item.amount_inr, item.amount_usd)}</strong>
+                    {!item.fallback && <> · Priority: <strong style={{ color:"var(--teal-700)" }}>{item.application_priority_score}/100</strong></>}
                   </div>
                 </div>
                 <button className="btn-primary" style={{ padding:".4rem .85rem", fontSize:".76rem" }} onClick={() => onNavigate("autopilot")}>

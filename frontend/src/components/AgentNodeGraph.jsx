@@ -8,8 +8,8 @@ export default function AgentNodeGraph({ onSelectAgentNode }) {
     { id: "profile", title: "Profile Agent", icon: UserCheck, desc: "Parses student academic & financial parameters" },
     { id: "discovery", title: "Discovery Agent", icon: Compass, desc: "Queries curated database of 25+ funding sources" },
     { id: "eligibility", title: "Eligibility Agent", icon: CheckCircle2, desc: "Performs multi-attribute criteria reasoning" },
-    { id: "planner", title: "Planner Agent", icon: Target, desc: "Calculates Funding Gap & solves optimal EV stack" },
-    { id: "autopilot", title: "Autopilot Agent", icon: FileText, desc: "Drafts tailored essays & audits documents" },
+    { id: "planner", title: "Planner Agent", icon: Target, desc: "Calculates the funding gap and application priority score" },
+    { id: "autopilot", title: "Autopilot Agent", icon: FileText, desc: "Drafts tailored essays and checks document readiness" },
     { id: "deadline", title: "Deadline Agent", icon: Kanban, desc: "Monitors closing urgency & pipeline status" }
   ];
 

@@ -3,9 +3,9 @@ import { BookOpen, CheckCircle2, Compass, FileText, Flag, Target, UserRound } fr
 
 const steps = [
   { icon: UserRound, title: "Build your funding profile", detail: "Open Profile Agent and add your course, year, GPA, location, family-income range, achievements, and annual study cost. Your details stay editable.", action: "Profile Agent" },
-  { icon: Target, title: "Understand the funding gap", detail: "Funding Planner subtracts confirmed aid from your annual cost, then ranks opportunities by eligibility and expected value—not just the advertised award.", action: "Funding Planner" },
+  { icon: Target, title: "Understand the funding gap", detail: "Funding Planner subtracts confirmed aid from your annual cost, then ranks applications by match strength, funding relevance, and deadline urgency.", action: "Funding Planner" },
   { icon: Compass, title: "Verify every opportunity", detail: "Use Opportunity Market to see real programmes. Open the official-source link before applying: provider rules, dates, and award values can change each cycle.", action: "Opportunity Market" },
-  { icon: FileText, title: "Prepare, never auto-submit", detail: "Autopilot creates a document checklist and editable draft. Upload and verify documents, then review every statement yourself. EduFund never submits an application for you.", action: "Autopilot Studio" },
+  { icon: FileText, title: "Prepare, never auto-submit", detail: "Autopilot creates a document-readiness checklist and editable draft. Match filenames to checklist items, then review every file and statement yourself. EduFund never submits an application for you.", action: "Autopilot Studio" },
   { icon: Flag, title: "Track the application pipeline", detail: "Move each card from Discovered to Planned, Drafting, Ready to Submit, and Submitted. Prioritize high-urgency deadlines first.", action: "Pipeline & Deadlines" },
 ];
 

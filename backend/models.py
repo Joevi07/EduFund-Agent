@@ -74,18 +74,11 @@ class StrategyItem(BaseModel):
     amount_inr: float
     amount_usd: float
     match_score: int
-    expected_value_inr: float
-    expected_value_usd: float
+    funding_relevance_score: float
+    deadline_urgency_score: int
+    application_priority_score: float
     priority_rank: int
     urgency: str
-
-class FundingConfidence(BaseModel):
-    guaranteed_inr: float
-    probable_inr: float
-    possible_inr: float
-    remaining_risk_inr: float
-    confidence_score: int
-    explanation: str
 
 class FundingPlan(BaseModel):
     total_cost_inr: float
@@ -101,7 +94,6 @@ class FundingPlan(BaseModel):
     coverage_percentage: float
     recommended_strategy: List[StrategyItem]
     agent_advice: str
-    confidence: Optional[FundingConfidence] = None
 
 class AutopilotDraftRequest(BaseModel):
     opportunity_id: str
@@ -133,10 +125,13 @@ class DocumentAuditRequest(BaseModel):
     uploaded_files: List[str]  # e.g. ["marksheet.pdf", "income_certificate.pdf"]
 
 class DocumentAuditResponse(BaseModel):
-    verification_status: str  # PASSED, PENDING, FAILED
-    verified_files: List[Dict[str, Any]]
+    readiness_status: Literal["COMPLETE", "INCOMPLETE"]
+    matched_files: List[Dict[str, Any]]
     missing_requirements: List[str]
-    audit_notes: str
+    matched_count: int
+    required_count: int
+    completion_percentage: int
+    readiness_notes: str
 
 class StrategySimulateRequest(BaseModel):
     profile: StudentProfile

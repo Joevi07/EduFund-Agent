@@ -81,8 +81,9 @@ export default function App() {
         amount_inr: 50000,
         amount_usd: 600,
         match_score: 95,
-        expected_value_inr: 57000,
-        expected_value_usd: 684,
+        funding_relevance_score: 83.3,
+        deadline_urgency_score: 75,
+        application_priority_score: 88.1,
         priority_rank: 1,
         urgency: "HIGH"
       },
@@ -93,8 +94,9 @@ export default function App() {
         amount_inr: 25000,
         amount_usd: 300,
         match_score: 90,
-        expected_value_inr: 27000,
-        expected_value_usd: 324,
+        funding_relevance_score: 41.7,
+        deadline_urgency_score: 100,
+        application_priority_score: 79.9,
         priority_rank: 2,
         urgency: "HIGH"
       }

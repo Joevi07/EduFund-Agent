@@ -1,3 +1,5 @@
+import os
+import re
 from typing import Optional, List, Dict, Any
 from models import (
     StudentProfile, 
@@ -29,16 +31,20 @@ class AutopilotAgent:
             profile = StudentProfile()
 
         missing_info = []
+        missing_documents = set()
         if "Income Certificate" in opp.required_documents:
             inc = profile.financial_constraints.get("annual_family_income_inr")
             if not inc:
-                missing_info.append("Verified Family Income Certificate / Tax Return")
+                missing_info.append("Family Income Certificate / Tax Return")
+                missing_documents.add("Income Certificate")
         if "Official Transcript" in opp.required_documents or "10th & 12th Marksheets" in opp.required_documents:
             if not profile.academic_profile.get("gpa"):
                 missing_info.append("Official Academic Transcript Document")
+                missing_documents.update({"Official Transcript", "10th & 12th Marksheets"})
         if "Portfolio / GitHub" in opp.required_documents:
             if not any("github" in a.lower() or "hackathon" in a.lower() for a in profile.achievements):
                 missing_info.append("Portfolio / GitHub URL Link")
+                missing_documents.add("Portfolio / GitHub")
 
         prompts = opp.essay_prompts if opp.essay_prompts else ["Why are you the ideal candidate for this funding opportunity?"]
         selected_prompt = prompts[min(prompt_index, len(prompts) - 1)]
@@ -61,12 +67,12 @@ class AutopilotAgent:
 
         checklist = []
         for doc in opp.required_documents:
-            is_ready = doc not in missing_info
+            is_ready = doc not in missing_documents
             checklist.append({
                 "item": doc,
                 "type": "DOCUMENT",
-                "status": "READY" if is_ready else "PENDING_UPLOAD",
-                "notes": "Verified in profile" if is_ready else "Action required by student"
+                "status": "CHECKLIST_READY" if is_ready else "NEEDS_DOCUMENT",
+                "notes": "Profile information suggests this item is available; file contents are not verified." if is_ready else "Action required by student"
             })
 
         checklist.append({
@@ -133,35 +139,46 @@ class AutopilotAgent:
         opp = get_opportunity_by_id(req.opportunity_id)
         required = opp.required_documents if opp else ["10th & 12th Marksheets", "Income Certificate"]
 
-        uploaded_names = [f.lower() for f in req.uploaded_files]
-        verified = []
+        def normalized_name(value: str) -> str:
+            stem = os.path.splitext(os.path.basename(value))[0]
+            return " ".join(re.sub(r"[^a-z0-9]+", " ", stem.lower()).split())
+
+        uploaded_names = [(file_name, normalized_name(file_name)) for file_name in req.uploaded_files]
+        matched = []
         missing = []
 
         for doc in required:
-            doc_lower = doc.lower()
-            found = any(u in doc_lower or doc_lower in u for u in uploaded_names)
-            if found:
-                verified.append({
+            document_name = normalized_name(doc)
+            matching_file = next((
+                file_name for file_name, uploaded_name in uploaded_names
+                if uploaded_name and (uploaded_name in document_name or document_name in uploaded_name)
+            ), None)
+            if matching_file:
+                matched.append({
                     "document": doc,
-                    "file_name": doc.replace(" ", "_").lower() + ".pdf",
-                    "status": "VERIFIED_VALID",
-                    "confidence": 98.5
+                    "file_name": matching_file,
+                    "status": "CHECKLIST_MATCH",
                 })
             else:
                 missing.append(doc)
 
-        status = "PASSED" if len(missing) == 0 else "PENDING"
-        notes = f"Audited {len(req.uploaded_files)} uploaded files against {len(required)} opportunity rules. "
-        if missing:
-            notes += f"Missing: {', '.join(missing)}."
-        else:
-            notes += "All required documents verified successfully!"
+        required_count = len(required)
+        matched_count = len(matched)
+        completion_percentage = round((matched_count / required_count) * 100) if required_count else 100
+        status = "COMPLETE" if not missing else "INCOMPLETE"
+        notes = (
+            f"Filename checklist match: {matched_count} of {required_count} required documents "
+            f"({completion_percentage}%). File contents and authenticity were not verified."
+        )
 
         return DocumentAuditResponse(
-            verification_status=status,
-            verified_files=verified,
+            readiness_status=status,
+            matched_files=matched,
             missing_requirements=missing,
-            audit_notes=notes
+            matched_count=matched_count,
+            required_count=required_count,
+            completion_percentage=completion_percentage,
+            readiness_notes=notes,
         )
 
     def check_draft_evidence(self, req: DraftEvidenceRequest) -> DraftEvidenceResponse:

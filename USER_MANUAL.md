@@ -14,9 +14,9 @@ If account creation says **“services are offline”**, the first terminal is n
 
 1. **Create account** — use your name, email, and a password of at least eight characters.
 2. **Profile Agent** — add your study level, course, GPA, location, family-income range, annual education cost, confirmed aid, and achievements. Select **Save profile**.
-3. **Funding Planner** — review your remaining funding gap, expected-value priority order, and the **Funding Confidence Meter**. Guaranteed funding is already confirmed; probable and possible figures are planning estimates. Treat all estimates as a planning aid, not a guarantee of an award.
+3. **Funding Planner** — review your remaining funding gap, the non-probabilistic **Funding Coverage Outlook**, and the 0–100 **Application Priority Score**. The outlook compares listed scholarship amounts with the remaining gap after confirmed aid; awards are not guaranteed. The priority score combines eligibility or match strength (55%), funding relevance (25%), and deadline urgency (20%). It ranks application effort; it is not an award probability or expected monetary return.
 4. **Opportunity Market** — filter the verified catalogue. Use the external-link icon on every card to open the programme's official website and confirm the current rules, dates, documents, and amount.
-5. **Autopilot Studio** — choose an opportunity, use the checklist, audit files, and edit the draft. Never submit a statement you have not personally reviewed.
+5. **Autopilot Studio** — choose an opportunity, use **Document Readiness** to match selected filenames against the required-document checklist, and edit the draft. The readiness percentage is checklist completion only; EduFund does not inspect file contents or verify authenticity. Never submit a statement you have not personally reviewed.
 6. **Pipeline & Deadlines** — move each item through Discovered, Planned, Drafting, Ready to Submit, and Submitted. The **Document Reuse Map** shows documents that can support more than one active application, while the **Deadline Collision Detector** highlights deadlines that fall within the same seven-day window. Begin with the nearest deadline.
 
 ### Verify an essay before authorising it
