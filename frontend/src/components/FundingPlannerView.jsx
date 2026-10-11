@@ -1,7 +1,8 @@
 import React from "react";
-import { Bot, Calculator, ExternalLink, Info, Target, TrendingUp, Zap } from "lucide-react";
+import { Bot, Calculator, ExternalLink, Info, Layers, Target, TrendingUp, Zap } from "lucide-react";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 import { hasSourceUrl } from "../utils/actionCenter";
+import { buildSuggestedFundingBundle } from "../utils/fundingBundle";
 
 const CHECK_LABEL = { PASS:"Satisfied", FAIL:"Unsatisfied", WARN:"Review", UNAVAILABLE:"Unavailable" };
 const CHECK_COLOR = { PASS:"#16713a", FAIL:"#b42318", WARN:"#a15c00", UNAVAILABLE:"#667085" };
@@ -13,6 +14,8 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
   const coveragePercentage = hasFundingGap ? Math.min(100, plan.coverage_percentage || 0) : 100;
   const evaluationsById = Object.fromEntries((plan.eligibility_evaluations || []).map(result => [result.opportunity_id, result]));
   const opportunitiesById = Object.fromEntries(opportunities.map(opportunity => [opportunity.id, opportunity]));
+  const fundingBundle = buildSuggestedFundingBundle(plan.recommended_strategy || [], opportunities, plan.funding_gap_inr);
+  const bundleRemainingUsd = Math.max(0, (plan.funding_gap_usd || 0) - fundingBundle.listedAwardsUsd);
 
   const equations = [
     { label:"Total Annual Cost", val:fmt(plan.total_cost_inr, plan.total_cost_usd), color:"var(--text-primary)", bg:"rgba(255,255,255,.7)" },
@@ -115,6 +118,48 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="bento-box">
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:"1rem", flexWrap:"wrap", marginBottom:"1rem" }}>
+          <div>
+            <h3 style={{ fontSize:"1.05rem", fontWeight:700, display:"flex", alignItems:"center", gap:".5rem" }}>
+              <Layers size={18} color="var(--accent-teal)"/> Suggested Funding Bundle
+            </h3>
+            <p style={{ fontSize:".76rem", color:"var(--text-secondary)", marginTop:".28rem" }}>
+              A priority-ordered combination of listed award amounts from current recommendations.
+            </p>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <span style={{ display:"block", color:"var(--text-muted)", fontSize:".68rem", fontWeight:700, textTransform:"uppercase" }}>Funding need</span>
+            <strong style={{ color:"var(--text-primary)", fontSize:"1.2rem" }}>{fmt(plan.funding_gap_inr, plan.funding_gap_usd)}</strong>
+          </div>
+        </div>
+
+        {fundingBundle.items.length ? <>
+          <div style={{ display:"grid", gap:".55rem" }}>
+            {fundingBundle.items.map((item, index) => <div key={item.opportunity_id} style={{ display:"grid", gridTemplateColumns:"auto minmax(0,1fr) auto", gap:".75rem", alignItems:"center", padding:".7rem .8rem", border:"1px solid var(--border-subtle)", borderRadius:10, background:"rgba(18,163,165,.035)" }}>
+              <span className="badge badge-indigo">{index + 1}</span>
+              <div>
+                <strong style={{ display:"block", fontSize:".82rem", color:"var(--text-primary)" }}>{item.title}</strong>
+                <div style={{ display:"flex", gap:".35rem", flexWrap:"wrap", marginTop:".3rem" }}>
+                  {item.bundle_reasons.map(reason => <span key={reason} className="badge badge-teal" style={{ fontSize:".58rem" }}>{reason}</span>)}
+                </div>
+              </div>
+              <strong style={{ color:"var(--accent-sage)", fontSize:".9rem", whiteSpace:"nowrap" }}>{fmt(item.amount_inr, item.amount_usd)}</strong>
+            </div>)}
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:".65rem", marginTop:".8rem" }}>
+            <div style={{ padding:".65rem", border:"1px solid var(--border-subtle)", borderRadius:8 }}><span style={{ display:"block", fontSize:".7rem", color:"var(--text-muted)" }}>Listed awards in bundle</span><strong>{fmt(fundingBundle.listedAwardsInr, fundingBundle.listedAwardsUsd)}</strong></div>
+            <div style={{ padding:".65rem", border:"1px solid var(--border-subtle)", borderRadius:8 }}><span style={{ display:"block", fontSize:".7rem", color:"var(--text-muted)" }}>Potential gap remaining</span><strong>{fmt(fundingBundle.remainingGapInr, bundleRemainingUsd)}</strong></div>
+          </div>
+        </> : <div style={{ padding:".85rem", border:"1px dashed var(--border-subtle)", borderRadius:9, color:"var(--text-secondary)", fontSize:".78rem" }}>
+          {hasFundingGap ? "No current non-expired recommendation has a positive listed award amount to add to a bundle." : "Confirmed aid currently covers the funding need, so no suggested bundle is required."}
+        </div>}
+
+        <p style={{ marginTop:".8rem", padding:".6rem .7rem", borderRadius:8, background:"#fff8e9", border:"1px solid #f4dfad", color:"#885c12", fontSize:".7rem", lineHeight:1.45 }}>
+          This is a suggested combination of advertised amounts, not guaranteed funding, an award forecast, or an optimization result. EduFund does not assume you will win multiple awards. Mutual-exclusivity rules are not recorded in the current catalogue, so confirm each provider's terms before combining awards.
+        </p>
       </div>
 
       <div className="bento-box">

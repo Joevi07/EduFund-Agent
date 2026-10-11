@@ -217,19 +217,29 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
               />
               <div className="evidence-action">
                 <button className="btn-secondary" onClick={handleEvidenceCheck} disabled={checkingEvidence || !editedDraft.trim()}>
-                  <ShieldCheck size={15}/>{checkingEvidence ? "Checking profile evidence…" : "Check profile evidence"}
+                  <ShieldCheck size={15}/>{checkingEvidence ? "Coaching evidence use…" : "Run Essay Evidence Coach"}
                 </button>
-                <span>Flags strong claims that are not represented in your saved profile.</span>
+                <span>Connects draft claims to saved profile evidence without inventing student facts.</span>
               </div>
               {evidence && (
                 <div className="evidence-results">
-                  <div className="evidence-summary"><strong>{evidence.supported_count}</strong> supported profile facts <span>·</span> <strong>{evidence.review_count}</strong> claims to review</div>
-                  {evidence.findings.length === 0 ? <p>No profile-linked or high-risk claims were found. Review the draft manually before submitting.</p> : evidence.findings.map((finding, index) => (
-                    <div className={`evidence-finding ${finding.status === "SUPPORTED" ? "supported" : "review"}`} key={`${finding.claim}-${index}`}>
-                      <span>{finding.status === "SUPPORTED" ? "Profile supported" : "Review claim"}</span>
-                      <p>{finding.claim}</p><small>{finding.detail}</small>
-                    </div>
-                  ))}
+                  <div className="evidence-summary">
+                    <strong>Essay Evidence Strength</strong>
+                    <span>{evidence.supported_count} of {evidence.total_claims} reviewed claims supported</span>
+                    <small>{evidence.needs_evidence_count} need evidence · {evidence.review_count} need review</small>
+                  </div>
+                  <p className="evidence-method">{evidence.methodology_note}</p>
+                  {evidence.findings.length === 0 ? <p>No reviewable first-person or evidence-sensitive claims were detected. Review the draft manually before submitting.</p> : evidence.findings.map((finding, index) => {
+                    const stateClass = finding.status === "SUPPORTED" ? "supported" : finding.status === "NEEDS_EVIDENCE" ? "needs-evidence" : "review";
+                    const stateLabel = finding.status === "SUPPORTED" ? "Supported" : finding.status === "NEEDS_EVIDENCE" ? "Needs Evidence" : "Review";
+                    return <div className={`evidence-finding ${stateClass}`} key={`${finding.claim}-${index}`}>
+                      <span>{stateLabel}</span>
+                      <p>{finding.claim}</p>
+                      <small>{finding.detail}</small>
+                      {finding.evidence_reference && <small className="evidence-reference"><strong>Evidence:</strong> {finding.evidence_reference}</small>}
+                      {finding.suggestion && <small className="evidence-suggestion"><strong>Suggestion:</strong> {finding.suggestion}</small>}
+                    </div>;
+                  })}
                 </div>
               )}
             </div>

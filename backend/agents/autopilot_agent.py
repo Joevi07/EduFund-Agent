@@ -196,16 +196,183 @@ class AutopilotAgent:
         )
 
     def check_draft_evidence(self, req: DraftEvidenceRequest) -> DraftEvidenceResponse:
-        draft = req.draft_text.lower()
         profile = req.student_profile
-        known_facts = [profile.course, str(profile.academic_profile.get("gpa", "")), *profile.achievements, *profile.interests]
+
+        def normalized(value: Any) -> str:
+            return " ".join(re.sub(r"[^a-z0-9]+", " ", str(value).lower().replace(",", "")).split())
+
+        stop_words = {
+            "a", "an", "and", "as", "at", "for", "from", "in", "is", "my", "of", "on", "or",
+            "the", "to", "with", "student", "year",
+        }
+
+        def meaningful_tokens(value: str) -> set[str]:
+            return {
+                token for token in normalized(value).split()
+                if (len(token) > 1 or token.isdigit()) and token not in stop_words
+            }
+
+        evidence_entries = []
+
+        def add_evidence(category: str, label: str, value: Any) -> None:
+            if value is None or not str(value).strip():
+                return
+            evidence_entries.append({
+                "category": category,
+                "label": f"{label}: {value}",
+                "value": normalized(value),
+                "tokens": meaningful_tokens(str(value)),
+            })
+
+        add_evidence("identity", "Student name", profile.name)
+        add_evidence("education", "Education level", profile.education_level)
+        add_evidence("course", "Course", profile.course)
+        gpa = profile.academic_profile.get("gpa")
+        max_gpa = profile.academic_profile.get("max_gpa")
+        if gpa and max_gpa:
+            add_evidence("academic", "Academic profile", f"GPA {gpa}/{max_gpa}")
+        add_evidence("academic", "Standardized test", profile.academic_profile.get("standardized_test"))
+        add_evidence("academic", "Year of study", profile.academic_profile.get("year_of_study"))
+        for achievement in profile.achievements:
+            add_evidence("achievement", "Achievement", achievement)
+        for interest in profile.interests:
+            add_evidence("interest", "Interest", interest)
+        add_evidence("location", "Country", profile.location.get("country"))
+        add_evidence("location", "State", profile.location.get("state"))
+        add_evidence("location", "City", profile.location.get("city"))
+        target_cost = profile.financial_constraints.get("target_annual_cost_inr")
+        if target_cost:
+            add_evidence("financial", "Target annual cost", target_cost)
+        family_income = profile.financial_constraints.get("annual_family_income_inr")
+        if family_income:
+            add_evidence("financial", "Annual family income", family_income)
+
+        risk_rules = [
+            (
+                "leadership",
+                re.compile(r"\b(leadership|leader|led|managed|organised|organized|founded|mentored|coordinated|captain|president)\b", re.I),
+                "Add a specific leadership example, responsibility, action, team context, or measurable result if one genuinely applies.",
+            ),
+            (
+                "achievement",
+                re.compile(r"\b(won|winner|award|awarded|published|ranked|first|best|top|excellence|consistently demonstrated)\b", re.I),
+                "Name the specific achievement, award, publication, or result only if it is accurate and can be supported.",
+            ),
+            (
+                "project",
+                re.compile(r"\b(project|research|built|created|developed|impact|volunteer|community service|hackathon)\b", re.I),
+                "If one genuinely applies, add the project, research, or service example, your role, and a measurable result where available.",
+            ),
+            (
+                "academic",
+                re.compile(r"\b(gpa|cgpa|grade|marks?|score|rank|percentile|academic record)\b", re.I),
+                "Use the exact GPA, mark, rank, test result, or academic record that the student can support.",
+            ),
+            (
+                "financial",
+                re.compile(r"\b(income|financial|afford|expenses?|annual cost|funding need)\b", re.I),
+                "Use only financial figures or circumstances that are accurate and supported by the student's records.",
+            ),
+        ]
+        allowed_categories = {
+            "leadership": {"achievement"},
+            "achievement": {"achievement"},
+            "project": {"achievement"},
+            "academic": {"academic", "achievement"},
+            "financial": {"financial"},
+        }
+        leadership_terms = re.compile(r"\b(lead|leader|led|managed|organised|organized|founded|mentored|coordinated|captain|president)\b", re.I)
+        generic_leadership_claim = re.compile(r"\b(demonstrated leadership|leadership skills?|leadership experience|a leader)\b", re.I)
+
+        raw_sentences = re.split(r"(?<=[.!?])\s+|[\r\n]+", req.draft_text)
+        sentences = []
+        for sentence in raw_sentences:
+            cleaned = re.sub(r"^[A-Z][A-Z &<>()-]{3,}:\s*", "", sentence.strip()).strip()
+            if len(cleaned.split()) < 4:
+                continue
+            is_first_person = re.search(r"\b(i|i'm|i've|my|me|we|our)\b", cleaned, re.I)
+            has_specific_value = re.search(r"\d", cleaned)
+            has_risk_language = any(rule.search(cleaned) for _, rule, _ in risk_rules)
+            if is_first_person or has_specific_value or has_risk_language:
+                sentences.append(cleaned)
+
         findings = []
-        for fact in known_facts:
-            fact = str(fact).strip()
-            if fact and fact.lower() in draft:
-                findings.append(EvidenceFinding(claim=fact, status="SUPPORTED", detail="This claim is present in your saved profile."))
-        risk_phrases = ["national", "international", "published", "led", "founded", "awarded", "first", "best"]
-        for sentence in [s.strip() for s in req.draft_text.replace("\n", " ").split(".") if s.strip()]:
-            if any(word in sentence.lower() for word in risk_phrases) and not any(str(f).lower() in sentence.lower() for f in known_facts if str(f)):
-                findings.append(EvidenceFinding(claim=sentence[:140], status="REVIEW", detail="This may be a strong claim not directly supported by your saved profile. Add evidence or revise it."))
-        return DraftEvidenceResponse(supported_count=len([f for f in findings if f.status == "SUPPORTED"]), review_count=len([f for f in findings if f.status == "REVIEW"]), findings=findings)
+        for sentence in sentences:
+            claim_normalized = normalized(sentence)
+            claim_tokens = meaningful_tokens(sentence)
+            matches = []
+            for entry in evidence_entries:
+                entry_tokens = entry["tokens"]
+                overlap = claim_tokens & entry_tokens
+                direct_match = bool(
+                    entry["value"] and f" {entry['value']} " in f" {claim_normalized} "
+                )
+                token_match = bool(
+                    entry_tokens
+                    and len(overlap) >= min(2, len(entry_tokens))
+                    and (len(overlap) / len(entry_tokens)) >= 0.6
+                )
+                if direct_match or token_match:
+                    matches.append({
+                        "entry": entry,
+                        "strong": direct_match or entry_tokens.issubset(claim_tokens),
+                    })
+
+            risks = [(category, suggestion) for category, rule, suggestion in risk_rules if rule.search(sentence)]
+            if risks and risks[0][0] == "leadership" and generic_leadership_claim.search(sentence):
+                leadership_evidence = next((
+                    entry for entry in evidence_entries
+                    if entry["category"] == "achievement" and leadership_terms.search(entry["label"])
+                ), None)
+                if leadership_evidence and not any(match["entry"] is leadership_evidence for match in matches):
+                    matches.append({"entry": leadership_evidence, "strong": True})
+
+            relevant_matches = [match["entry"] for match in matches]
+            if risks:
+                relevant_categories = set().union(*(allowed_categories[category] for category, _ in risks))
+                relevant_matches = [
+                    match["entry"] for match in matches
+                    if match["strong"] and match["entry"]["category"] in relevant_categories
+                ]
+
+            if relevant_matches:
+                references = "; ".join(entry["label"] for entry in relevant_matches[:2])
+                findings.append(EvidenceFinding(
+                    claim=sentence,
+                    status="SUPPORTED",
+                    detail="This claim connects to information already present in the saved profile.",
+                    evidence_reference=references,
+                ))
+            elif risks:
+                suggestions = []
+                for _, suggestion in risks:
+                    if suggestion not in suggestions:
+                        suggestions.append(suggestion)
+                findings.append(EvidenceFinding(
+                    claim=sentence,
+                    status="NEEDS_EVIDENCE",
+                    detail="No matching evidence for this claim was found in the saved profile.",
+                    suggestion=" ".join(suggestions),
+                ))
+            else:
+                findings.append(EvidenceFinding(
+                    claim=sentence,
+                    status="REVIEW",
+                    detail="This sentence is not directly linked to a saved profile fact.",
+                    suggestion="Confirm it is accurate and add a specific example only if one genuinely applies.",
+                ))
+
+        supported_count = len([finding for finding in findings if finding.status == "SUPPORTED"])
+        needs_evidence_count = len([finding for finding in findings if finding.status == "NEEDS_EVIDENCE"])
+        review_count = len([finding for finding in findings if finding.status == "REVIEW"])
+        return DraftEvidenceResponse(
+            supported_count=supported_count,
+            needs_evidence_count=needs_evidence_count,
+            review_count=review_count,
+            total_claims=len(findings),
+            findings=findings,
+            methodology_note=(
+                "Deterministic sentence-level comparison against the saved profile. This is coaching, not factual verification, "
+                "plagiarism detection, or a confidence score. Review every suggestion before editing."
+            ),
+        )

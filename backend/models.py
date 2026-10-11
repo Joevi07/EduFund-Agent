@@ -183,10 +183,15 @@ class DraftEvidenceRequest(BaseModel):
 
 class EvidenceFinding(BaseModel):
     claim: str
-    status: Literal["SUPPORTED", "REVIEW"]
+    status: Literal["SUPPORTED", "NEEDS_EVIDENCE", "REVIEW"]
     detail: str
+    evidence_reference: Optional[str] = None
+    suggestion: Optional[str] = None
 
 class DraftEvidenceResponse(BaseModel):
     supported_count: int
+    needs_evidence_count: int
     review_count: int
+    total_claims: int
     findings: List[EvidenceFinding]
+    methodology_note: str

@@ -11,7 +11,7 @@ if BACKEND_DIR not in sys.path:
 from agents.autopilot_agent import AutopilotAgent
 from agents.eligibility_agent import EligibilityAgent
 from agents.planner_agent import PlannerAgent
-from models import DocumentAuditRequest, EligibilityCheck, Opportunity, OpportunityEligibility, StudentProfile
+from models import DraftEvidenceRequest, DocumentAuditRequest, EligibilityCheck, Opportunity, OpportunityEligibility, StudentProfile
 
 
 def eligibility_result(opportunity, match_score):
@@ -250,6 +250,57 @@ class DocumentReadinessTests(unittest.TestCase):
         self.assertNotIn("verification_status", data)
         self.assertNotIn("confidence", str(data).lower())
         self.assertIn("authenticity were not verified", result.readiness_notes)
+
+
+class EssayEvidenceCoachTests(unittest.TestCase):
+    def test_claims_are_coached_without_inventing_profile_evidence(self):
+        profile = StudentProfile(
+            achievements=["Led a five-person robotics project"],
+            interests=["Robotics"],
+        )
+        result = AutopilotAgent().check_draft_evidence(DraftEvidenceRequest(
+            student_profile=profile,
+            draft_text=(
+                "I have consistently demonstrated leadership. "
+                "I won a national debate award. "
+                "I hope to continue learning and serving others."
+            ),
+        ))
+
+        self.assertEqual(result.total_claims, 3)
+        self.assertEqual(result.supported_count, 1)
+        self.assertEqual(result.needs_evidence_count, 1)
+        self.assertEqual(result.review_count, 1)
+        self.assertEqual([finding.status for finding in result.findings], [
+            "SUPPORTED", "NEEDS_EVIDENCE", "REVIEW",
+        ])
+        self.assertIn("Led a five-person robotics project", result.findings[0].evidence_reference)
+        self.assertIsNone(result.findings[1].evidence_reference)
+        self.assertIn("only if it is accurate", result.findings[1].suggestion)
+        self.assertIn("not factual verification", result.methodology_note)
+
+    def test_short_profile_terms_require_whole_token_matches(self):
+        profile = StudentProfile(interests=["AI"], achievements=[])
+        result = AutopilotAgent().check_draft_evidence(DraftEvidenceRequest(
+            student_profile=profile,
+            draft_text="I aim to grow through collaboration and thoughtful study.",
+        ))
+
+        self.assertEqual(result.total_claims, 1)
+        self.assertEqual(result.supported_count, 0)
+        self.assertEqual(result.findings[0].status, "REVIEW")
+
+    def test_partial_achievement_overlap_does_not_support_an_embellished_claim(self):
+        profile = StudentProfile(achievements=["Won a state debate award"])
+        result = AutopilotAgent().check_draft_evidence(DraftEvidenceRequest(
+            student_profile=profile,
+            draft_text="I won a national debate award.",
+        ))
+
+        self.assertEqual(result.supported_count, 0)
+        self.assertEqual(result.needs_evidence_count, 1)
+        self.assertEqual(result.findings[0].status, "NEEDS_EVIDENCE")
+        self.assertIsNone(result.findings[0].evidence_reference)
 
 
 if __name__ == "__main__":
