@@ -1,4 +1,4 @@
-"""Verified funding catalogue: check official links before any application."""
+"""Curated funding catalogue: check official links before any application."""
 from typing import List, Optional
 from datetime import date
 from models import Opportunity

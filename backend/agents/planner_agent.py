@@ -33,8 +33,10 @@ class PlannerAgent:
         funding_gap_usd = round(funding_gap_inr / usd_rate, 2)
 
         scored_items = []
+        eligibility_evaluations = []
         for opp in opportunities:
             eval_result = self.eligibility_agent.evaluate_opportunity(profile, opp)
+            eligibility_evaluations.append(eval_result)
             match_score = max(0, min(100, eval_result.match_score))
             funding_relevance_score = (
                 min(100.0, max(0.0, (opp.amount_inr / funding_gap_inr) * 100.0))
@@ -123,6 +125,7 @@ class PlannerAgent:
             remaining_gap_usd=remaining_gap_usd,
             coverage_percentage=coverage_pct,
             recommended_strategy=strategy,
+            eligibility_evaluations=eligibility_evaluations,
             agent_advice=advice,
         )
 

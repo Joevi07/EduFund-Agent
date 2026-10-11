@@ -1,17 +1,26 @@
 import React, { useState } from "react";
-import { Search, ExternalLink, Zap, Clock, X, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, CircleHelp, ExternalLink, Search, X, XCircle, Zap, Clock } from "lucide-react";
+import { hasSourceUrl } from "../utils/actionCenter";
 
 const CATEGORIES = ["All", "Scholarship", "Fee Waiver", "Grant", "Competition", "Institutional Aid"];
 
 const URGENCY_BADGE = { HIGH:"badge-low", MEDIUM:"badge-medium", LOW:"badge-high" };
+const CHECK_META = {
+  PASS: { label:"Satisfied", Icon:CheckCircle2, color:"#16713a", background:"rgba(41,165,87,.07)", border:"rgba(41,165,87,.18)" },
+  FAIL: { label:"Unsatisfied", Icon:XCircle, color:"#b42318", background:"rgba(180,35,24,.06)", border:"rgba(180,35,24,.18)" },
+  WARN: { label:"Review", Icon:AlertCircle, color:"#a15c00", background:"rgba(217,119,6,.07)", border:"rgba(217,119,6,.2)" },
+  UNAVAILABLE: { label:"Unavailable", Icon:CircleHelp, color:"#667085", background:"rgba(102,112,133,.06)", border:"rgba(102,112,133,.18)" },
+};
 
-export default function DiscoveryMarketplaceView({ opportunities, currency, onSelectAutopilot }) {
+export default function DiscoveryMarketplaceView({ opportunities, currency, onSelectAutopilot, eligibilityEvaluations = [], fundingGapInr = 0 }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery,    setSearchQuery]    = useState("");
   const [selectedOpp,   setSelectedOpp]    = useState(null);
 
   const isINR = currency === "INR";
   const fmt   = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
+  const evaluationById = Object.fromEntries(eligibilityEvaluations.map(result => [result.opportunity_id, result]));
+  const selectedEvaluation = selectedOpp ? evaluationById[selectedOpp.id] : null;
 
   const filtered = opportunities.filter(o => {
     const matchCat  = activeCategory === "All" || o.category.toLowerCase() === activeCategory.toLowerCase();
@@ -27,7 +36,7 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
         <div>
           <h2 style={{ fontSize:"1.55rem", fontWeight:800, letterSpacing:"-.035em" }}>Opportunity Marketplace</h2>
           <p style={{ color:"var(--text-secondary)", fontSize:".88rem", marginTop:".2rem" }}>
-            Verified scholarships, grants & waivers — confirm details on official sources before applying.
+            Curated scholarships, grants & waivers with provider links — confirm current details on the official source before applying.
           </p>
         </div>
         <div style={{ position:"relative", minWidth:280 }}>
@@ -70,14 +79,18 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:".85rem" }}>
                 <span className="badge badge-teal">{opp.category}</span>
                 <span className={`badge ${URGENCY_BADGE[opp.urgency] || "badge-medium"}`} style={{ display:"flex", alignItems:"center", gap:".3rem" }}>
-                  <Clock size={11}/> {opp.days_left}d left
+                  <Clock size={11}/> {opp.days_left < 0 ? "Deadline passed" : `${opp.days_left}d left`}
                 </span>
               </div>
               {/* Title */}
               <h3 style={{ fontSize:"1.05rem", fontWeight:700, marginBottom:".25rem", color:"var(--text-primary)", lineHeight:1.3 }}>{opp.title}</h3>
               <p style={{ color:"var(--text-secondary)", fontSize:".8rem", marginBottom:".75rem" }}>
                 by <strong style={{ color:"var(--accent-teal)" }}>{opp.provider}</strong>
+                {hasSourceUrl(opp.website_url) && <span style={{ marginLeft:".45rem", fontSize:".68rem", color:"var(--teal-700)", fontWeight:700 }}>· Official source linked</span>}
               </p>
+              {evaluationById[opp.id] && <div style={{ fontSize:".7rem", color:"var(--text-secondary)", marginBottom:".55rem" }}>
+                Eligibility match strength: <strong style={{ color:"var(--teal-700)" }}>{evaluationById[opp.id].match_score}/100</strong> · {evaluationById[opp.id].rating.toLowerCase()} match
+              </div>}
               <p style={{ fontSize:".83rem", color:"var(--text-secondary)", lineHeight:1.55, marginBottom:"1rem" }}>{opp.description}</p>
             </div>
 
@@ -89,14 +102,14 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
                   {fmt(opp.amount_inr, opp.amount_usd)}
                 </div>
               </div>
-              <div style={{ display:"flex", gap:".45rem" }}>
+              <div style={{ display:"flex", gap:".45rem", flexWrap:"wrap", justifyContent:"flex-end" }}>
                 <button className="btn-secondary" style={{ padding:".42rem .75rem", fontSize:".78rem" }} onClick={() => setSelectedOpp(opp)}>
                   View Details
                 </button>
-                {opp.website_url && (
+                {hasSourceUrl(opp.website_url) && (
                   <a href={opp.website_url} target="_blank" rel="noreferrer"
-                    className="btn-secondary" style={{ padding:".42rem .65rem", textDecoration:"none" }}>
-                    <ExternalLink size={14}/>
+                    className="btn-secondary" aria-label={`Open official source for ${opp.title}`} style={{ padding:".42rem .65rem", textDecoration:"none" }}>
+                    Source <ExternalLink size={14}/>
                   </a>
                 )}
                 <button className="btn-primary" style={{ padding:".42rem .8rem", fontSize:".78rem" }} onClick={() => onSelectAutopilot(opp)}>
@@ -136,18 +149,32 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
               {fmt(selectedOpp.amount_inr, selectedOpp.amount_usd)}
             </p>
 
+            <div style={{ display:"flex", gap:".6rem", flexWrap:"wrap", marginBottom:"1rem", fontSize:".72rem", color:"var(--text-secondary)" }}>
+              <span>Provider: <strong>{selectedOpp.provider}</strong></span>
+              <span>Deadline: <strong>{selectedOpp.days_left < 0 ? "passed" : `${selectedOpp.days_left} days left`}</strong></span>
+              <span>Funding-gap contribution: <strong>{fundingGapInr > 0 ? `${Math.min(100, Math.round((selectedOpp.amount_inr / fundingGapInr) * 100))}%` : "no remaining gap"}</strong></span>
+              {hasSourceUrl(selectedOpp.website_url) && <a href={selectedOpp.website_url} target="_blank" rel="noreferrer" style={{ color:"var(--teal-700)", fontWeight:700, display:"inline-flex", gap:3, alignItems:"center" }}>Official source linked <ExternalLink size={12}/></a>}
+            </div>
+
             <h4 style={{ fontSize:".88rem", fontWeight:700, marginBottom:".65rem", color:"var(--text-secondary)", textTransform:"uppercase", letterSpacing:".06em" }}>Eligibility Checks</h4>
+            <p style={{ fontSize:".78rem", color:"var(--text-secondary)", marginBottom:".65rem" }}>
+              {selectedEvaluation?.key_reasoning || "No profile-based eligibility evaluation is available yet."}
+            </p>
             <div style={{ display:"flex", flexDirection:"column", gap:".55rem", marginBottom:"1.5rem" }}>
-              {[
-                { label:"Degree Level", detail:`${selectedOpp.degree_levels?.join(", ")} — profile checked` },
-                { label:"Min GPA",      detail:`${selectedOpp.min_gpa || "No requirement"} — profile checked` },
-                { label:"Income Limit", detail:`₹${selectedOpp.max_family_income_inr?.toLocaleString() || "Not specified"} — profile checked` },
-              ].map(({ label, detail }) => (
-                <div key={label} style={{ padding:".65rem .9rem", background:"rgba(41,165,87,.07)", border:"1px solid rgba(41,165,87,.18)", borderRadius:10, display:"flex", gap:".65rem", fontSize:".84rem", alignItems:"flex-start" }}>
-                  <CheckCircle2 size={17} color="var(--accent-sage)" style={{ flexShrink:0, marginTop:1 }}/>
-                  <div><strong style={{ color:"var(--text-primary)" }}>{label}:</strong> <span style={{ color:"var(--text-secondary)" }}>{detail}</span></div>
-                </div>
-              ))}
+              {(selectedEvaluation?.checks || []).map(check => {
+                const meta = CHECK_META[check.status] || CHECK_META.UNAVAILABLE;
+                const StatusIcon = meta.Icon;
+                return <div key={check.criterion} style={{ padding:".65rem .9rem", background:meta.background, border:`1px solid ${meta.border}`, borderRadius:10, display:"flex", gap:".65rem", fontSize:".84rem", alignItems:"flex-start" }}>
+                  <StatusIcon size={17} color={meta.color} style={{ flexShrink:0, marginTop:1 }}/>
+                  <div>
+                    <div style={{ display:"flex", alignItems:"center", gap:".4rem", flexWrap:"wrap" }}><strong style={{ color:"var(--text-primary)" }}>{check.criterion}</strong><span style={{ color:meta.color, fontSize:".66rem", fontWeight:800, textTransform:"uppercase" }}>{meta.label}</span></div>
+                    <span style={{ color:"var(--text-secondary)", display:"block", marginTop:2 }}>{check.detail}</span>
+                  </div>
+                </div>;
+              })}
+              {!selectedEvaluation && <div style={{ padding:".75rem .9rem", background:CHECK_META.UNAVAILABLE.background, border:`1px solid ${CHECK_META.UNAVAILABLE.border}`, borderRadius:10, color:"var(--text-secondary)", fontSize:".8rem" }}>
+                Open the Funding Planner after completing your profile to generate satisfied, unsatisfied, review, and unavailable criteria.
+              </div>}
             </div>
 
             <div style={{ display:"flex", justifyContent:"flex-end", gap:".75rem" }}>

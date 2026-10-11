@@ -251,9 +251,9 @@ export async function auditDocuments(opportunityId, uploadedFiles) {
     });
     const matchedDocuments = new Set(matchedFiles.map(item => item.document));
     const missingRequirements = requirements.filter(document => !matchedDocuments.has(document));
-    const completionPercentage = requirements.length ? Math.round((matchedFiles.length / requirements.length) * 100) : 0;
+    const completionPercentage = requirements.length ? Math.round((matchedFiles.length / requirements.length) * 100) : null;
     return {
-      readiness_status: requirements.length && !missingRequirements.length ? "COMPLETE" : "INCOMPLETE",
+      readiness_status: requirements.length ? (!missingRequirements.length ? "COMPLETE" : "INCOMPLETE") : "UNAVAILABLE",
       matched_files: matchedFiles,
       missing_requirements: missingRequirements,
       matched_count: matchedFiles.length,
@@ -261,7 +261,7 @@ export async function auditDocuments(opportunityId, uploadedFiles) {
       completion_percentage: completionPercentage,
       readiness_notes: requirements.length
         ? `Filename checklist match: ${matchedFiles.length} of ${requirements.length} required documents (${completionPercentage}%). File contents and authenticity were not verified.`
-        : "The backend is unavailable, so checklist readiness could not be calculated. File contents and authenticity were not verified."
+        : "Required documents are unavailable while the backend is offline, so checklist completion cannot be calculated. Confirm requirements on the provider's official source."
     };
   }
 }

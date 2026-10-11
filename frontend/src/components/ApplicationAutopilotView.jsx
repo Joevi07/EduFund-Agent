@@ -19,7 +19,7 @@ import {
 import { generateAutopilotDraft, refineAutopilotDraft, checkDraftEvidence } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
 
-export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, token, onUpdateStatus }) {
+export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, token, onUpdateStatus, onDocumentReadiness }) {
   const [loading, setLoading] = useState(false);
   const [refining, setRefining] = useState(false);
   const [autopilotData, setAutopilotData] = useState(null);
@@ -148,8 +148,11 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
             {/* Document Readiness Widget */}
             <div className="bento-box form-bento">
               <DocumentAuditorWidget 
+                key={oppId}
                 opportunityId={oppId}
                 requiredDocuments={selectedOpportunity?.required_documents}
+                sourceUrl={selectedOpportunity?.website_url}
+                onReadinessChange={onDocumentReadiness}
               />
             </div>
           </div>
@@ -260,7 +263,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
 
               {submissionComplete ? (
                 <div className="btn-emerald" style={{ width: "100%", justifyContent: "center", padding: "0.7rem" }}>
-                  <CheckCircle size={16} /> Application Verified & Ready for Portal Submission!
+                  <CheckCircle size={16} /> Application Reviewed & Ready for Portal Submission!
                 </div>
               ) : (
                 <button 

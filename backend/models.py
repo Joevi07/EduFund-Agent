@@ -93,6 +93,7 @@ class FundingPlan(BaseModel):
     remaining_gap_usd: float
     coverage_percentage: float
     recommended_strategy: List[StrategyItem]
+    eligibility_evaluations: List[OpportunityEligibility] = Field(default_factory=list)
     agent_advice: str
 
 class AutopilotDraftRequest(BaseModel):
@@ -125,12 +126,12 @@ class DocumentAuditRequest(BaseModel):
     uploaded_files: List[str]  # e.g. ["marksheet.pdf", "income_certificate.pdf"]
 
 class DocumentAuditResponse(BaseModel):
-    readiness_status: Literal["COMPLETE", "INCOMPLETE"]
+    readiness_status: Literal["COMPLETE", "INCOMPLETE", "UNAVAILABLE"]
     matched_files: List[Dict[str, Any]]
     missing_requirements: List[str]
     matched_count: int
     required_count: int
-    completion_percentage: int
+    completion_percentage: Optional[int] = None
     readiness_notes: str
 
 class StrategySimulateRequest(BaseModel):

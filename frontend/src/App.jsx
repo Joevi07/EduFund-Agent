@@ -73,6 +73,7 @@ export default function App() {
     remaining_gap_inr: 0,
     remaining_gap_usd: 0,
     coverage_percentage: 100,
+    eligibility_evaluations: [],
     recommended_strategy: [
       {
         opportunity_id: "opp_001",
@@ -106,9 +107,11 @@ export default function App() {
 
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [documentReadiness, setDocumentReadiness] = useState({});
 
   useEffect(() => {
     async function initData() {
+      setDocumentReadiness({});
       const health = await fetchHealth();
       setBackendConnected(health.status === "ok");
 
@@ -146,6 +149,15 @@ export default function App() {
   const handleApplicationStatus = async (oppId, status, draftText = null) => {
     const record = await updateApplicationStatus(oppId, status, draftText, null, auth.token);
     setApplications(current => [...current.filter(item => item.opportunity_id !== oppId), record]);
+  };
+
+  const handleDocumentReadiness = (oppId, result) => {
+    setDocumentReadiness(current => {
+      if (result) return { ...current, [oppId]: result };
+      const next = { ...current };
+      delete next[oppId];
+      return next;
+    });
   };
 
   const handleScenarioResult = (simPlan) => {
@@ -191,6 +203,9 @@ export default function App() {
               onScenarioResult={handleScenarioResult}
               opportunitiesCount={opportunities.length}
               opportunities={opportunities}
+              applications={applications}
+              documentReadiness={documentReadiness}
+              onSelectAutopilot={handleSelectAutopilot}
             />
           )}
 
@@ -209,6 +224,8 @@ export default function App() {
               currency={currency}
               onNavigate={setActiveTab}
               onScenarioResult={handleScenarioResult}
+              opportunities={opportunities}
+              onSelectAutopilot={handleSelectAutopilot}
             />
           )}
 
@@ -217,6 +234,8 @@ export default function App() {
               opportunities={opportunities}
               currency={currency}
               onSelectAutopilot={handleSelectAutopilot}
+              eligibilityEvaluations={plan?.eligibility_evaluations || []}
+              fundingGapInr={plan?.funding_gap_inr || 0}
             />
           )}
 
@@ -227,6 +246,7 @@ export default function App() {
               currency={currency}
               token={auth.token}
               onUpdateStatus={handleApplicationStatus}
+              onDocumentReadiness={handleDocumentReadiness}
             />
           )}
 

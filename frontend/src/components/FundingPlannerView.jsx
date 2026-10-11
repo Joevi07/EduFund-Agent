@@ -1,12 +1,18 @@
 import React from "react";
-import { Bot, Calculator, Info, Target, TrendingUp, Zap } from "lucide-react";
+import { Bot, Calculator, ExternalLink, Info, Target, TrendingUp, Zap } from "lucide-react";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
+import { hasSourceUrl } from "../utils/actionCenter";
 
-export default function FundingPlannerView({ plan, profile, currency, onNavigate, onScenarioResult }) {
+const CHECK_LABEL = { PASS:"Satisfied", FAIL:"Unsatisfied", WARN:"Review", UNAVAILABLE:"Unavailable" };
+const CHECK_COLOR = { PASS:"#16713a", FAIL:"#b42318", WARN:"#a15c00", UNAVAILABLE:"#667085" };
+
+export default function FundingPlannerView({ plan, profile, currency, onNavigate, onScenarioResult, opportunities = [], onSelectAutopilot }) {
   const isINR = currency === "INR";
   const fmt = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
   const hasFundingGap = plan.funding_gap_inr > 0;
   const coveragePercentage = hasFundingGap ? Math.min(100, plan.coverage_percentage || 0) : 100;
+  const evaluationsById = Object.fromEntries((plan.eligibility_evaluations || []).map(result => [result.opportunity_id, result]));
+  const opportunitiesById = Object.fromEntries(opportunities.map(opportunity => [opportunity.id, opportunity]));
 
   const equations = [
     { label:"Total Annual Cost", val:fmt(plan.total_cost_inr, plan.total_cost_usd), color:"var(--text-primary)", bg:"rgba(255,255,255,.7)" },
@@ -128,28 +134,57 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
               </tr>
             </thead>
             <tbody>
-              {plan.recommended_strategy.map((item, index) => (
-                <tr key={item.opportunity_id || index} style={{ borderBottom:"1px solid var(--border-subtle)", transition:"background .15s" }}
-                  onMouseEnter={event => event.currentTarget.style.background="rgba(18,163,165,.04)"}
-                  onMouseLeave={event => event.currentTarget.style.background="transparent"}
-                >
-                  <td style={{ padding:".75rem" }}><span className="badge badge-indigo">#{item.priority_rank}</span></td>
-                  <td style={{ padding:".75rem", fontWeight:700, color:"var(--text-primary)", maxWidth:220 }}>{item.title}</td>
-                  <td style={{ padding:".75rem" }}><span className="badge badge-teal">{item.category}</span></td>
-                  <td style={{ padding:".75rem", fontWeight:700 }}>{fmt(item.amount_inr, item.amount_usd)}</td>
-                  <td style={{ padding:".75rem" }}><strong style={{ color:"var(--teal-700)", fontSize:"1rem" }}>{item.application_priority_score}/100</strong></td>
-                  <td style={{ padding:".75rem", minWidth:180, fontSize:".72rem", color:"var(--text-secondary)", lineHeight:1.55 }}>
-                    <div>Match: <strong>{item.match_score}</strong> × 55%</div>
-                    <div>Funding: <strong>{item.funding_relevance_score}</strong> × 25%</div>
-                    <div>Deadline: <strong>{item.deadline_urgency_score}</strong> × 20%</div>
-                  </td>
-                  <td style={{ padding:".75rem" }}>
-                    <button className="btn-primary" style={{ padding:".35rem .75rem", fontSize:".75rem" }} onClick={() => onNavigate("autopilot")}>
-                      Autopilot <Zap size={12}/>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {plan.recommended_strategy.map((item, index) => {
+                const evaluation = evaluationsById[item.opportunity_id];
+                const opportunity = opportunitiesById[item.opportunity_id];
+                return <React.Fragment key={item.opportunity_id || index}>
+                  <tr style={{ borderBottom:"1px solid var(--border-subtle)", transition:"background .15s" }}
+                    onMouseEnter={event => event.currentTarget.style.background="rgba(18,163,165,.04)"}
+                    onMouseLeave={event => event.currentTarget.style.background="transparent"}
+                  >
+                    <td style={{ padding:".75rem" }}><span className="badge badge-indigo">#{item.priority_rank}</span></td>
+                    <td style={{ padding:".75rem", fontWeight:700, color:"var(--text-primary)", maxWidth:240 }}>
+                      {item.title}
+                      {opportunity?.provider && <small style={{ display:"block", color:"var(--text-muted)", fontWeight:500, marginTop:3 }}>by {opportunity.provider}</small>}
+                    </td>
+                    <td style={{ padding:".75rem" }}><span className="badge badge-teal">{item.category}</span></td>
+                    <td style={{ padding:".75rem", fontWeight:700 }}>{fmt(item.amount_inr, item.amount_usd)}</td>
+                    <td style={{ padding:".75rem" }}><strong style={{ color:"var(--teal-700)", fontSize:"1rem" }}>{item.application_priority_score}/100</strong></td>
+                    <td style={{ padding:".75rem", minWidth:180, fontSize:".72rem", color:"var(--text-secondary)", lineHeight:1.55 }}>
+                      <div>Match: <strong>{item.match_score}</strong> × 55%</div>
+                      <div>Funding: <strong>{item.funding_relevance_score}</strong> × 25%</div>
+                      <div>Deadline: <strong>{item.deadline_urgency_score}</strong> × 20%</div>
+                    </td>
+                    <td style={{ padding:".75rem" }}>
+                      <button className="btn-primary" style={{ padding:".35rem .75rem", fontSize:".75rem" }} onClick={() => opportunity && onSelectAutopilot ? onSelectAutopilot(opportunity) : onNavigate("autopilot")}>
+                        Autopilot <Zap size={12}/>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom:"1px solid var(--border-subtle)" }}>
+                    <td colSpan={7} style={{ padding:"0 .75rem .75rem" }}>
+                      <details style={{ border:"1px solid rgba(18,163,165,.14)", borderRadius:9, padding:".55rem .7rem", background:"rgba(18,163,165,.025)" }}>
+                        <summary style={{ cursor:"pointer", color:"var(--teal-700)", fontWeight:700, fontSize:".75rem" }}>Why this scholarship matches</summary>
+                        <p style={{ margin:".55rem 0", color:"var(--text-secondary)", fontSize:".72rem" }}>{evaluation?.key_reasoning || "Eligibility details are unavailable for this plan result."}</p>
+                        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))", gap:".45rem" }}>
+                          {(evaluation?.checks || []).map(check => <div key={check.criterion} style={{ padding:".5rem .6rem", border:"1px solid var(--border-subtle)", borderRadius:8, background:"rgba(255,255,255,.72)" }}>
+                            <div style={{ display:"flex", justifyContent:"space-between", gap:".5rem", fontSize:".68rem", fontWeight:800 }}>
+                              <span>{check.criterion}</span>
+                              <span style={{ color:CHECK_COLOR[check.status] || CHECK_COLOR.UNAVAILABLE }}>{CHECK_LABEL[check.status] || check.status}</span>
+                            </div>
+                            <p style={{ marginTop:".2rem", color:"var(--text-secondary)", fontSize:".67rem", lineHeight:1.4 }}>{check.detail}</p>
+                          </div>)}
+                        </div>
+                        <div style={{ display:"flex", gap:".8rem", flexWrap:"wrap", marginTop:".55rem", fontSize:".7rem", color:"var(--text-secondary)" }}>
+                          <span>Deadline urgency contribution: <strong>{item.deadline_urgency_score}/100</strong></span>
+                          <span>Funding-gap contribution: <strong>{item.funding_relevance_score}%</strong></span>
+                          {hasSourceUrl(opportunity?.website_url) && <a href={opportunity.website_url} target="_blank" rel="noreferrer" style={{ color:"var(--teal-700)", fontWeight:700, display:"inline-flex", alignItems:"center", gap:3 }}>Official source linked <ExternalLink size={12}/></a>}
+                        </div>
+                      </details>
+                    </td>
+                  </tr>
+                </React.Fragment>;
+              })}
             </tbody>
           </table>
         </div>

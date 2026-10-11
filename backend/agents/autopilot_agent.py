@@ -137,7 +137,21 @@ class AutopilotAgent:
 
     def audit_documents(self, req: DocumentAuditRequest) -> DocumentAuditResponse:
         opp = get_opportunity_by_id(req.opportunity_id)
-        required = opp.required_documents if opp else ["10th & 12th Marksheets", "Income Certificate"]
+        required = opp.required_documents if opp else []
+
+        if not required:
+            return DocumentAuditResponse(
+                readiness_status="UNAVAILABLE",
+                matched_files=[],
+                missing_requirements=[],
+                matched_count=0,
+                required_count=0,
+                completion_percentage=None,
+                readiness_notes=(
+                    "Required documents are not listed in the EduFund catalogue for this opportunity, "
+                    "so checklist completion cannot be calculated. Confirm requirements on the provider's official source."
+                ),
+            )
 
         def normalized_name(value: str) -> str:
             stem = os.path.splitext(os.path.basename(value))[0]
@@ -164,7 +178,7 @@ class AutopilotAgent:
 
         required_count = len(required)
         matched_count = len(matched)
-        completion_percentage = round((matched_count / required_count) * 100) if required_count else 100
+        completion_percentage = round((matched_count / required_count) * 100)
         status = "COMPLETE" if not missing else "INCOMPLETE"
         notes = (
             f"Filename checklist match: {matched_count} of {required_count} required documents "

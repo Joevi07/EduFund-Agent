@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { TrendingUp, ShieldCheck, ArrowRight, Zap, Target, Layers, AlertTriangle, Compass, FileText, Kanban, UserCheck, SearchCheck, CircleCheckBig, Calculator } from "lucide-react";
 import AgentNodeGraph from "./AgentNodeGraph";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
+import ActionCenter from "./ActionCenter";
 
-export default function DashboardView({ profile, plan, currency, onNavigate, onScenarioResult, opportunitiesCount = 0, opportunities = [] }) {
+export default function DashboardView({ profile, plan, currency, onNavigate, onScenarioResult, opportunitiesCount = 0, opportunities = [], applications = [], documentReadiness = {}, onSelectAutopilot }) {
   const [logFilter, setLogFilter] = useState("All");
   const [showAlert, setShowAlert] = useState(true);
 
@@ -39,14 +40,14 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
   const aidDeg      = Math.round(((plan?.confirmed_aid_inr || 0) / ((plan?.total_cost_inr || 1))) * 360);
 
   // Personalised log entries derived from real profile/plan data
-  const logs = useMemo(() => [
+  const logs = [
     { type: "Profile", Icon:UserCheck, text: `Profile is ready for ${name} (${course})` },
-    { type: "Discovery", Icon:SearchCheck, text: `Discovery checked ${opportunitiesCount || "available"} verified funding sources` },
-    { type: "Eligibility", Icon:CircleCheckBig, text: `Eligibility evaluated ${stratCount} candidates using GPA ${gpa}/${maxGpa}` },
+    { type: "Discovery", Icon:SearchCheck, text: `Discovery checked ${opportunitiesCount || "available"} curated opportunities with provider links` },
+    { type: "Eligibility", Icon:CircleCheckBig, text: `Eligibility evaluated ${plan?.eligibility_evaluations?.length || stratCount} opportunities using GPA ${gpa}/${maxGpa}` },
     { type: "Planner", Icon:Calculator, text: `Funding Planner calculated a gap of ${fmt(plan?.funding_gap_inr || 0, plan?.funding_gap_usd || 0)}` },
     { type: "Planner", Icon:Target, text: `Strategy portfolio has ${covPct}% coverage potential` },
     { type: "Autopilot", Icon:FileText, text: `Autopilot is ready to prepare ${stratCount} application drafts` },
-  ], [name, course, opportunitiesCount, stratCount, gpa, maxGpa, covPct]);
+  ];
 
   const filteredLogs = logFilter === "All" ? logs : logs.filter(l => l.type === logFilter);
   const LOG_TYPES    = ["All", "Profile", "Discovery", "Eligibility", "Planner", "Autopilot"];
@@ -83,6 +84,17 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
       </div>
 
       {/* ── Success alert banner ── */}
+      <ActionCenter
+        profile={profile}
+        plan={plan}
+        opportunities={opportunities}
+        applications={applications}
+        documentReadiness={documentReadiness}
+        currency={currency}
+        onNavigate={onNavigate}
+        onSelectAutopilot={onSelectAutopilot}
+      />
+
       {showAlert && (
         <div className="alert-success-box">
           <div style={{ display:"flex", alignItems:"center", gap:".6rem" }}>
@@ -206,7 +218,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
                   Autopilot <Zap size={12}/>
                 </button>
               </div>
-            )) : <div style={{ padding:"1rem", color:"var(--text-secondary)", fontSize:".84rem", border:"1px dashed var(--border-subtle)", borderRadius:10 }}>Loading verified opportunities for your queue…</div>}
+            )) : <div style={{ padding:"1rem", color:"var(--text-secondary)", fontSize:".84rem", border:"1px dashed var(--border-subtle)", borderRadius:10 }}>Loading curated opportunities for your queue…</div>}
           </div>
         </div>
       </div>
