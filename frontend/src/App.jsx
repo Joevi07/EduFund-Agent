@@ -122,7 +122,7 @@ export default function App() {
       const planData = await generateFundingPlan(activeProfile);
       if (planData) setPlan(planData);
 
-      const applicationData = await fetchApplications();
+      const applicationData = auth ? await fetchApplications(auth.token) : [];
       setApplications(applicationData);
     }
     initData();
@@ -142,7 +142,7 @@ export default function App() {
   };
 
   const handleApplicationStatus = async (oppId, status, draftText = null) => {
-    const record = await updateApplicationStatus(oppId, status, draftText);
+    const record = await updateApplicationStatus(oppId, status, draftText, null, auth.token);
     setApplications(current => [...current.filter(item => item.opportunity_id !== oppId), record]);
   };
 
@@ -223,6 +223,7 @@ export default function App() {
               selectedOpportunity={selectedOpportunity || opportunities[0]}
               profile={profile}
               currency={currency}
+              token={auth.token}
               onUpdateStatus={handleApplicationStatus}
             />
           )}

@@ -178,11 +178,11 @@ export async function simulateStrategyScenario(profile, coverageTargetPct, extra
   }
 }
 
-export async function generateAutopilotDraft(opportunityId, promptIndex = 0, profile = null) {
+export async function generateAutopilotDraft(opportunityId, promptIndex = 0, profile = null, token = "") {
   try {
     const res = await fetch(`${API_BASE_URL}/autopilot/draft`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         opportunity_id: opportunityId,
         prompt_index: promptIndex,
@@ -270,9 +270,9 @@ export async function fetchDeadlines() {
   }
 }
 
-export async function fetchApplications() {
+export async function fetchApplications(token) {
   try {
-    const res = await fetch(`${API_BASE_URL}/applications`);
+    const res = await fetch(`${API_BASE_URL}/applications`, { headers: { Authorization: `Bearer ${token}` } });
     if (!res.ok) throw new Error("Error loading application pipeline");
     return await res.json();
   } catch (err) {
@@ -280,11 +280,11 @@ export async function fetchApplications() {
   }
 }
 
-export async function updateApplicationStatus(opportunityId, status, draftText = null, notes = null) {
+export async function updateApplicationStatus(opportunityId, status, draftText = null, notes = null, token = "") {
   try {
     const res = await fetch(`${API_BASE_URL}/applications/${opportunityId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ status, draft_text: draftText, notes })
     });
     if (!res.ok) throw new Error("Error saving application status");

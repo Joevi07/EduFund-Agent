@@ -19,7 +19,7 @@ import {
 import { generateAutopilotDraft, refineAutopilotDraft, checkDraftEvidence } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
 
-export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, onUpdateStatus }) {
+export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, token, onUpdateStatus }) {
   const [loading, setLoading] = useState(false);
   const [refining, setRefining] = useState(false);
   const [autopilotData, setAutopilotData] = useState(null);
@@ -40,7 +40,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
     async function loadAutopilot() {
       setLoading(true);
       try {
-        const res = await generateAutopilotDraft(oppId, 0, profile);
+        const res = await generateAutopilotDraft(oppId, 0, profile, token);
         setAutopilotData(res);
         setEditedDraft(res.draft_response || "");
         setEvidence(null);
@@ -55,7 +55,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
       }
     }
     loadAutopilot();
-  }, [oppId, profile]);
+  }, [oppId, profile, token]);
 
   const handleRefine = async (instruction) => {
     setRefining(true);

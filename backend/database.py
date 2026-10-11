@@ -11,7 +11,61 @@ DB_FILE = os.path.join(os.path.dirname(__file__), "edufund.db")
 def get_db_connection():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
+
+def _create_applications_table(cursor: sqlite3.Cursor) -> None:
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS applications (
+            user_id TEXT NOT NULL,
+            opportunity_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            draft_text TEXT,
+            notes TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, opportunity_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
+def _migrate_applications_table(cursor: sqlite3.Cursor) -> None:
+    """Replace the legacy global application table without guessing row ownership."""
+    table = cursor.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'applications'"
+    ).fetchone()
+    if not table:
+        _create_applications_table(cursor)
+        return
+
+    columns = list(cursor.execute("PRAGMA table_info(applications)"))
+    column_names = {row[1] for row in columns}
+    primary_key = [row[1] for row in sorted(columns, key=lambda row: row[5]) if row[5]]
+    if "user_id" in column_names and primary_key == ["user_id", "opportunity_id"]:
+        return
+
+    # Legacy rows have no reliable owner. Archive them instead of exposing them to
+    # every account or assigning potentially private drafts to an arbitrary user.
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS legacy_applications_archive (
+            archive_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            opportunity_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            draft_text TEXT,
+            notes TEXT,
+            updated_at TIMESTAMP,
+            archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    notes_expression = "notes" if "notes" in column_names else "NULL"
+    updated_expression = "updated_at" if "updated_at" in column_names else "CURRENT_TIMESTAMP"
+    cursor.execute(f"""
+        INSERT INTO legacy_applications_archive
+            (opportunity_id, status, draft_text, notes, updated_at)
+        SELECT opportunity_id, status, draft_text, {notes_expression}, {updated_expression}
+        FROM applications
+    """)
+    cursor.execute("DROP TABLE applications")
+    _create_applications_table(cursor)
 
 def init_db():
     """
@@ -55,24 +109,9 @@ def init_db():
         )
     """)
 
-    # Applications Tracker Table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS applications (
-            opportunity_id TEXT PRIMARY KEY,
-            status TEXT NOT NULL,
-            draft_text TEXT,
-            notes TEXT,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # Older local databases may predate notes. This migration is safe to re-run.
-    columns = {row[1] for row in cursor.execute("PRAGMA table_info(applications)")}
-    if "notes" not in columns:
-        cursor.execute("ALTER TABLE applications ADD COLUMN notes TEXT")
-
     cursor.execute("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'student', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
     cursor.execute("CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at TIMESTAMP NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+    _migrate_applications_table(cursor)
 
     conn.commit()
     conn.close()
@@ -142,25 +181,31 @@ def get_student_profile(user_id: str) -> Optional[Dict[str, Any]]:
 # Initialize DB on module import
 init_db()
 
-def list_applications() -> List[Dict[str, Any]]:
+def list_applications(user_id: str) -> List[Dict[str, Any]]:
     conn = get_db_connection()
-    rows = conn.execute("SELECT opportunity_id, status, draft_text, notes, updated_at FROM applications ORDER BY updated_at DESC").fetchall()
+    rows = conn.execute(
+        "SELECT opportunity_id, status, draft_text, notes, updated_at FROM applications WHERE user_id = ? ORDER BY updated_at DESC",
+        (user_id,),
+    ).fetchall()
     conn.close()
     return [dict(row) for row in rows]
 
-def upsert_application(opportunity_id: str, status: str, draft_text: Optional[str] = None, notes: Optional[str] = None) -> Dict[str, Any]:
+def upsert_application(user_id: str, opportunity_id: str, status: str, draft_text: Optional[str] = None, notes: Optional[str] = None) -> Dict[str, Any]:
     conn = get_db_connection()
     conn.execute("""
-        INSERT INTO applications (opportunity_id, status, draft_text, notes, updated_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-        ON CONFLICT(opportunity_id) DO UPDATE SET
+        INSERT INTO applications (user_id, opportunity_id, status, draft_text, notes, updated_at)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, opportunity_id) DO UPDATE SET
           status=excluded.status,
           draft_text=COALESCE(excluded.draft_text, applications.draft_text),
           notes=COALESCE(excluded.notes, applications.notes),
           updated_at=CURRENT_TIMESTAMP
-    """, (opportunity_id, status, draft_text, notes))
+    """, (user_id, opportunity_id, status, draft_text, notes))
     conn.commit()
-    row = conn.execute("SELECT opportunity_id, status, draft_text, notes, updated_at FROM applications WHERE opportunity_id = ?", (opportunity_id,)).fetchone()
+    row = conn.execute(
+        "SELECT opportunity_id, status, draft_text, notes, updated_at FROM applications WHERE user_id = ? AND opportunity_id = ?",
+        (user_id, opportunity_id),
+    ).fetchone()
     conn.close()
     return dict(row)
 

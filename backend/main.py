@@ -195,14 +195,15 @@ def simulate_strategy_scenario(request: StrategySimulateRequest):
     return planner_agent.simulate_scenario(request, opps)
 
 @app.post("/api/autopilot/draft", response_model=AutopilotDraftResponse)
-def prepare_autopilot_draft(request: AutopilotDraftRequest):
+def prepare_autopilot_draft(request: AutopilotDraftRequest, authorization: Optional[str] = Header(None)):
+    user = current_user(authorization)
     try:
         result = autopilot_agent.prepare_application(
             opp_id=request.opportunity_id,
             prompt_index=request.prompt_index,
             profile=request.student_profile
         )
-        upsert_application(request.opportunity_id, "DRAFTING", draft_text=result.draft_response)
+        upsert_application(user["id"], request.opportunity_id, "DRAFTING", draft_text=result.draft_response)
         return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -225,14 +226,16 @@ def get_deadlines():
     return deadline_agent.audit_deadlines(opps)
 
 @app.get("/api/applications", response_model=List[ApplicationRecord])
-def get_applications():
-    return list_applications()
+def get_applications(authorization: Optional[str] = Header(None)):
+    user = current_user(authorization)
+    return list_applications(user["id"])
 
 @app.put("/api/applications/{opp_id}", response_model=ApplicationRecord)
-def update_application(opp_id: str, update: ApplicationStatusUpdate):
+def update_application(opp_id: str, update: ApplicationStatusUpdate, authorization: Optional[str] = Header(None)):
+    user = current_user(authorization)
     if not get_opportunity_by_id(opp_id):
         raise HTTPException(status_code=404, detail="Opportunity not found")
-    return upsert_application(opp_id, update.status, update.draft_text, update.notes)
+    return upsert_application(user["id"], opp_id, update.status, update.draft_text, update.notes)
 
 if __name__ == "__main__":
     import uvicorn
