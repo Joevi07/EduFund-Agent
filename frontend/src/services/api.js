@@ -1,5 +1,5 @@
 // In development, Vite proxies /api to FastAPI. Set VITE_API_URL when deployed.
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 async function authRequest(path, body) {
   let res;
@@ -39,6 +39,16 @@ export async function fetchHealth() {
   } catch (err) {
     console.warn("Backend offline, client local fallback mode:", err);
     return { status: "local_mode" };
+  }
+}
+
+export async function fetchLlmStatus() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/llm/status`);
+    if (!res.ok) throw new Error("Unable to read AI status");
+    return await res.json();
+  } catch {
+    return { gemini_available: false, model: null, message: "Rule-based drafting available" };
   }
 }
 

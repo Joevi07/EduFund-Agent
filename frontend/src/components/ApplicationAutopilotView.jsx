@@ -16,7 +16,7 @@ import {
   GraduationCap,
   Scissors
 } from "lucide-react";
-import { generateAutopilotDraft, refineAutopilotDraft, checkDraftEvidence } from "../services/api";
+import { generateAutopilotDraft, refineAutopilotDraft, checkDraftEvidence, fetchLlmStatus } from "../services/api";
 import DocumentAuditorWidget from "./DocumentAuditorWidget";
 
 export default function ApplicationAutopilotView({ selectedOpportunity, profile, currency, token, onUpdateStatus, onDocumentReadiness }) {
@@ -32,6 +32,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [evidence, setEvidence] = useState(null);
   const [checkingEvidence, setCheckingEvidence] = useState(false);
+  const [llmStatus, setLlmStatus] = useState(null);
 
   const oppId = selectedOpportunity ? selectedOpportunity.id : "opp_001";
   const oppTitle = selectedOpportunity ? selectedOpportunity.title : "Reliance Foundation STEM Scholarship";
@@ -56,6 +57,8 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
     }
     loadAutopilot();
   }, [oppId, profile, token]);
+
+  useEffect(() => { fetchLlmStatus().then(setLlmStatus); }, []);
 
   const handleRefine = async (instruction) => {
     setRefining(true);
@@ -107,6 +110,7 @@ export default function ApplicationAutopilotView({ selectedOpportunity, profile,
         <p style={{ color: "var(--text-secondary)", fontSize: ".88rem", marginLeft:"2.5rem" }}>
           Extracts requirements, checks document-list readiness, refines essays with AI tone modifiers, and enforces human safety review.
         </p>
+        <div className={`ai-runtime-status ${llmStatus?.gemini_available ? "live" : "fallback"}`}><span className="ai-runtime-dot"/>{llmStatus?.gemini_available ? `Live AI connected: ${llmStatus.model}` : "Rule-based draft mode. Add GEMINI_API_KEY for live AI drafting."}</div>
       </div>
 
       {/* Target Opportunity Header */}

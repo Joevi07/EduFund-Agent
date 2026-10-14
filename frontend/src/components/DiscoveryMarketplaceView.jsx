@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle2, CircleHelp, ExternalLink, Search, X, XCircle, Zap, Clock } from "lucide-react";
 import { hasSourceUrl } from "../utils/actionCenter";
+import ExplainabilityCard from "./ExplainabilityCard";
+import ScamSafetyBadge from "./ScamSafetyBadge";
+import DeadlineCountdown from "./DeadlineCountdown";
+import MatchScoreRing from "./MatchScoreRing";
 
 const CATEGORIES = ["All", "Scholarship", "Fee Waiver", "Grant", "Competition", "Institutional Aid"];
 
@@ -78,9 +82,7 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
               {/* Badges row */}
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:".85rem" }}>
                 <span className="badge badge-teal">{opp.category}</span>
-                <span className={`badge ${URGENCY_BADGE[opp.urgency] || "badge-medium"}`} style={{ display:"flex", alignItems:"center", gap:".3rem" }}>
-                  <Clock size={11}/> {opp.days_left < 0 ? "Deadline passed" : `${opp.days_left}d left`}
-                </span>
+                <DeadlineCountdown deadline={opp.deadline} compact />
               </div>
               {/* Title */}
               <h3 style={{ fontSize:"1.05rem", fontWeight:700, marginBottom:".25rem", color:"var(--text-primary)", lineHeight:1.3 }}>{opp.title}</h3>
@@ -88,10 +90,13 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
                 by <strong style={{ color:"var(--accent-teal)" }}>{opp.provider}</strong>
                 {hasSourceUrl(opp.website_url) && <span style={{ marginLeft:".45rem", fontSize:".68rem", color:"var(--teal-700)", fontWeight:700 }}>· Official source linked</span>}
               </p>
-              {evaluationById[opp.id] && <div style={{ fontSize:".7rem", color:"var(--text-secondary)", marginBottom:".55rem" }}>
-                Eligibility match strength: <strong style={{ color:"var(--teal-700)" }}>{evaluationById[opp.id].match_score}/100</strong> · {evaluationById[opp.id].rating.toLowerCase()} match
-              </div>}
-              <p style={{ fontSize:".83rem", color:"var(--text-secondary)", lineHeight:1.55, marginBottom:"1rem" }}>{opp.description}</p>
+              {evaluationById[opp.id] && <div style={{ display:"flex", gap:".55rem", alignItems:"center", marginBottom:".55rem" }}><MatchScoreRing score={evaluationById[opp.id].match_score} size={46}/><div style={{ fontSize:".7rem", color:"var(--text-secondary)" }}>Live eligibility match<br/><strong style={{ color:"var(--teal-700)", fontSize:".78rem" }}>{evaluationById[opp.id].rating.toLowerCase()} match based on your profile</strong></div></div>}
+              <p style={{ fontSize:".83rem", color:"var(--text-secondary)", lineHeight:1.55, marginBottom:".55rem" }}>{opp.description}</p>
+              <div style={{ display:"flex", gap:".4rem", flexWrap:"wrap", marginBottom:".55rem" }}>
+                <ScamSafetyBadge opportunity={opp} inline />
+                {opp.last_reviewed_date && <span style={{ fontSize:".62rem", padding:".15rem .45rem", borderRadius:999, background:"rgba(18,163,165,.08)", border:"1px solid rgba(18,163,165,.2)", color:"var(--teal-700)", fontWeight:700 }}>Reviewed {opp.last_reviewed_date}</span>}
+              </div>
+              {evaluationById[opp.id]?.explainability && <ExplainabilityCard explainability={evaluationById[opp.id].explainability} compact />}
             </div>
 
             {/* Footer */}
@@ -151,7 +156,7 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
 
             <div style={{ display:"flex", gap:".6rem", flexWrap:"wrap", marginBottom:"1rem", fontSize:".72rem", color:"var(--text-secondary)" }}>
               <span>Provider: <strong>{selectedOpp.provider}</strong></span>
-              <span>Deadline: <strong>{selectedOpp.days_left < 0 ? "passed" : `${selectedOpp.days_left} days left`}</strong></span>
+              <DeadlineCountdown deadline={selectedOpp.deadline} />
               <span>Funding-gap contribution: <strong>{fundingGapInr > 0 ? `${Math.min(100, Math.round((selectedOpp.amount_inr / fundingGapInr) * 100))}%` : "no remaining gap"}</strong></span>
               {hasSourceUrl(selectedOpp.website_url) && <a href={selectedOpp.website_url} target="_blank" rel="noreferrer" style={{ color:"var(--teal-700)", fontWeight:700, display:"inline-flex", gap:3, alignItems:"center" }}>Official source linked <ExternalLink size={12}/></a>}
             </div>
@@ -160,6 +165,7 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
             <p style={{ fontSize:".78rem", color:"var(--text-secondary)", marginBottom:".65rem" }}>
               {selectedEvaluation?.key_reasoning || "No profile-based eligibility evaluation is available yet."}
             </p>
+            {selectedEvaluation && <div style={{ display:"flex", alignItems:"center", gap:".65rem", margin:".65rem 0 1rem", padding:".65rem", background:"rgba(18,163,165,.06)", borderRadius:10 }}><MatchScoreRing score={selectedEvaluation.match_score} size={64}/><div><strong style={{ color:"var(--text-primary)" }}>Animated profile match score</strong><span style={{ display:"block", color:"var(--text-secondary)", fontSize:".75rem", marginTop:3 }}>Updates whenever the profile or eligibility evaluation changes.</span></div></div>}
             <div style={{ display:"flex", flexDirection:"column", gap:".55rem", marginBottom:"1.5rem" }}>
               {(selectedEvaluation?.checks || []).map(check => {
                 const meta = CHECK_META[check.status] || CHECK_META.UNAVAILABLE;
@@ -175,6 +181,15 @@ export default function DiscoveryMarketplaceView({ opportunities, currency, onSe
               {!selectedEvaluation && <div style={{ padding:".75rem .9rem", background:CHECK_META.UNAVAILABLE.background, border:`1px solid ${CHECK_META.UNAVAILABLE.border}`, borderRadius:10, color:"var(--text-secondary)", fontSize:".8rem" }}>
                 Open the Funding Planner after completing your profile to generate satisfied, unsatisfied, review, and unavailable criteria.
               </div>}
+            </div>
+            {selectedEvaluation?.explainability && (
+              <div style={{ marginBottom:"1.25rem" }}>
+                <h4 style={{ fontSize:".88rem", fontWeight:700, marginBottom:".55rem", color:"var(--text-secondary)", textTransform:"uppercase", letterSpacing:".06em" }}>AI Explainability</h4>
+                <ExplainabilityCard explainability={selectedEvaluation.explainability} />
+              </div>
+            )}
+            <div style={{ marginBottom:"1.25rem" }}>
+              <ScamSafetyBadge opportunity={selectedOpp} />
             </div>
 
             <div style={{ display:"flex", justifyContent:"flex-end", gap:".75rem" }}>

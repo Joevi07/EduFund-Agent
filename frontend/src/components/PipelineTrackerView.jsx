@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Kanban, Clock, AlertTriangle, ChevronRight, FileStack, CalendarRange, CheckCircle2 } from "lucide-react";
+import { Kanban, Clock, AlertTriangle, ChevronRight, FileStack, CalendarRange, CheckCircle2, Calendar } from "lucide-react";
 import { fetchDeadlines, fetchOpportunities } from "../services/api";
+import DeadlineCalendarView from "./DeadlineCalendarView";
 
 const COLUMNS = [
   { id:"DISCOVERED",      label:"Discovered",        badge:"badge-teal",   next:"PLANNED"          },
@@ -25,6 +26,7 @@ export default function PipelineTrackerView({ opportunities, currency, applicati
   const fmt   = (inr, usd) => isINR ? `₹${inr.toLocaleString()}` : `$${usd.toLocaleString()}`;
   const [deadlineData, setDeadlineData] = useState(null);
   const [catalogue, setCatalogue] = useState(opportunities);
+  const [activeTab, setActiveTab] = useState("kanban"); // 'kanban' | 'calendar'
 
   useEffect(() => { fetchDeadlines().then(setDeadlineData); }, []);
   useEffect(() => {
@@ -72,6 +74,22 @@ export default function PipelineTrackerView({ opportunities, currency, applicati
         </p>
       </div>
 
+      {/* ── Tab toggle ── */}
+      <div style={{ display:"flex", gap:".4rem", padding:".25rem", background:"rgba(255,255,255,.7)", backdropFilter:"blur(10px)", border:"1px solid rgba(18,163,165,.18)", borderRadius:12, width:"fit-content" }}>
+        {[["kanban", Kanban, "Kanban Board"],["calendar", Calendar, "Deadline Calendar"]].map(([tab, Icon, label]) => (
+          <button key={tab} onClick={() => setActiveTab(tab)} style={{
+            display:"flex", alignItems:"center", gap:".4rem", padding:".38rem .85rem",
+            background: activeTab===tab ? "linear-gradient(135deg,var(--teal-500),var(--teal-600))" : "transparent",
+            color: activeTab===tab ? "#fff" : "var(--text-secondary)",
+            border:"none", borderRadius:9, fontWeight:700, fontSize:".8rem", cursor:"pointer",
+            transition:"all .18s ease", fontFamily:"var(--font-main)",
+            boxShadow: activeTab===tab ? "0 2px 8px rgba(18,163,165,.3)" : "none",
+          }}>
+            <Icon size={14} />{label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Deadline alert ── */}
       <div className="bento-box" style={{
         padding:"1rem 1.5rem",
@@ -111,59 +129,64 @@ export default function PipelineTrackerView({ opportunities, currency, applicati
         </section>
       </div>
 
-      {/* ── Kanban board ── */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"1rem", alignItems:"start" }}>
-        {COLUMNS.map(col => {
-          const items = getColItems(col.id);
-          const nextLabel = COLUMNS.find(c => c.id === col.next)?.label;
-          return (
-            <div key={col.id} className="bento-box" style={{ padding:"1.1rem", background: COL_COLORS[col.id], minHeight:380 }}>
-              {/* Column header */}
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:".9rem" }}>
-                <h3 style={{ fontSize:".9rem", fontWeight:700, color:"var(--text-primary)" }}>{col.label}</h3>
-                <span className={`badge ${col.badge}`}>{items.length}</span>
-              </div>
+      {/* ── Kanban board / Calendar ── */}
+      {activeTab === "calendar" ? (
+        <DeadlineCalendarView opportunities={opportunities} />
+      ) : (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"1rem", alignItems:"start" }}>
+          {COLUMNS.map(col => {
+            const items = getColItems(col.id);
+            const nextLabel = COLUMNS.find(c => c.id === col.next)?.label;
+            return (
+              <div key={col.id} className="bento-box" style={{ padding:"1.1rem", background: COL_COLORS[col.id], minHeight:380 }}>
+                {/* Column header */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:".9rem" }}>
+                  <h3 style={{ fontSize:".9rem", fontWeight:700, color:"var(--text-primary)" }}>{col.label}</h3>
+                  <span className={`badge ${col.badge}`}>{items.length}</span>
+                </div>
 
-              {/* Cards */}
-              <div style={{ display:"flex", flexDirection:"column", gap:".7rem" }}>
-                {items.length === 0 ? (
-                  <div style={{ textAlign:"center", color:"var(--text-muted)", fontSize:".78rem", padding:"2rem 0", borderRadius:10, border:"2px dashed rgba(18,163,165,.15)", background:"rgba(255,255,255,.4)" }}>
-                    No items
-                  </div>
-                ) : items.map(opp => (
-                  <div key={opp.id} style={{
-                    background:"rgba(255,255,255,.78)",
-                    backdropFilter:"blur(12px)",
-                    border:"1px solid rgba(18,163,165,.14)",
-                    borderRadius:10, padding:".85rem",
-                    transition:"all .2s ease",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.96)"; e.currentTarget.style.boxShadow="0 4px 16px rgba(10,50,50,.1)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.78)"; e.currentTarget.style.boxShadow="none"; }}
-                  >
-                    <div style={{ display:"flex", justifyContent:"space-between", fontSize:".72rem", marginBottom:".35rem" }}>
-                      <span style={{ color:"var(--accent-teal)", fontWeight:700 }}>{opp.category}</span>
-                      <span style={{ color: opp.days_left <= 15 ? "var(--amber-500)" : "var(--text-muted)", display:"flex", alignItems:"center", gap:".2rem" }}>
-                        <Clock size={11}/> {opp.days_left}d
-                      </span>
+                {/* Cards */}
+                <div style={{ display:"flex", flexDirection:"column", gap:".7rem" }}>
+                  {items.length === 0 ? (
+                    <div style={{ textAlign:"center", color:"var(--text-muted)", fontSize:".78rem", padding:"2rem 0", borderRadius:10, border:"2px dashed rgba(18,163,165,.15)", background:"rgba(255,255,255,.4)" }}>
+                      No items
                     </div>
-                    <div style={{ fontSize:".87rem", fontWeight:700, color:"var(--text-primary)", marginBottom:".3rem", lineHeight:1.3 }}>{opp.title}</div>
-                    <div style={{ fontSize:"1.05rem", fontWeight:900, color:"var(--accent-sage)", letterSpacing:"-.02em" }}>
-                      {fmt(opp.amount_inr, opp.amount_usd)}
+                  ) : items.map(opp => (
+                    <div key={opp.id} style={{
+                      background:"rgba(255,255,255,.78)",
+                      backdropFilter:"blur(12px)",
+                      border:"1px solid rgba(18,163,165,.14)",
+                      borderRadius:10, padding:".85rem",
+                      transition:"all .2s ease",
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.96)"; e.currentTarget.style.boxShadow="0 4px 16px rgba(10,50,50,.1)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.78)"; e.currentTarget.style.boxShadow="none"; }}
+                    >
+                      <div style={{ display:"flex", justifyContent:"space-between", fontSize:".72rem", marginBottom:".35rem" }}>
+                        <span style={{ color:"var(--accent-teal)", fontWeight:700 }}>{opp.category}</span>
+                        <span style={{ color: opp.days_left <= 15 ? "var(--amber-500)" : "var(--text-muted)", display:"flex", alignItems:"center", gap:".2rem" }}>
+                          <Clock size={11}/> {opp.days_left}d
+                        </span>
+                      </div>
+                      <div style={{ fontSize:".87rem", fontWeight:700, color:"var(--text-primary)", marginBottom:".3rem", lineHeight:1.3 }}>{opp.title}</div>
+                      <div style={{ fontSize:"1.05rem", fontWeight:900, color:"var(--accent-sage)", letterSpacing:"-.02em" }}>
+                        {fmt(opp.amount_inr, opp.amount_usd)}
+                      </div>
+                      {col.next && (
+                        <button className="btn-secondary" onClick={() => onUpdateStatus?.(opp.id, col.next)}
+                          style={{ marginTop:".65rem", width:"100%", justifyContent:"center", fontSize:".74rem", padding:".38rem .65rem" }}>
+                          → {nextLabel} <ChevronRight size={13}/>
+                        </button>
+                      )}
                     </div>
-                    {col.next && (
-                      <button className="btn-secondary" onClick={() => onUpdateStatus?.(opp.id, col.next)}
-                        style={{ marginTop:".65rem", width:"100%", justifyContent:"center", fontSize:".74rem", padding:".38rem .65rem" }}>
-                        → {nextLabel} <ChevronRight size={13}/>
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
+

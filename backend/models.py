@@ -50,6 +50,12 @@ class Opportunity(BaseModel):
     essay_prompts: List[str]
     website_url: str
     urgency: str = "MEDIUM"
+    last_reviewed_date: str = "2026-10-01"
+    source_verified: bool = True
+    is_official_domain: bool = True
+    requires_application_fee: bool = False
+    country: str = "India"
+    safety_audit: Dict[str, Any] = Field(default_factory=dict)
 
 class EligibilityCheck(BaseModel):
     criterion: str
@@ -66,6 +72,7 @@ class OpportunityEligibility(BaseModel):
     rating: str
     checks: List[EligibilityCheck]
     key_reasoning: str
+    explainability: Dict[str, Any] = Field(default_factory=dict)
 
 class StrategyItem(BaseModel):
     opportunity_id: str
@@ -79,6 +86,47 @@ class StrategyItem(BaseModel):
     application_priority_score: float
     priority_rank: int
     urgency: str
+
+class RescuePlanComponent(BaseModel):
+    layer: str  # "Scholarship Portfolio", "Fee-Waiver Options", "Education Loan Checklist", "Work-Study Support"
+    title: str
+    amount_inr: float
+    amount_usd: float
+    description: str
+    checklist: List[str] = Field(default_factory=list)
+    action_label: str
+
+class FundingGapRescuePlan(BaseModel):
+    funding_gap_inr: float
+    funding_gap_usd: float
+    scholarship_coverage_inr: float
+    scholarship_coverage_usd: float
+    fee_waiver_coverage_inr: float
+    fee_waiver_coverage_usd: float
+    work_study_coverage_inr: float
+    work_study_coverage_usd: float
+    loan_coverage_inr: float
+    loan_coverage_usd: float
+    remaining_gap_after_plan_inr: float
+    remaining_gap_after_plan_usd: float
+    rescue_strategy_summary: str
+    components: List[RescuePlanComponent] = Field(default_factory=list)
+
+class PortfolioDiversityGuardrail(BaseModel):
+    concentration_score: int  # 0-100, lower is better balanced
+    risk_level: str  # "LOW", "BALANCED", "MODERATE_RISK", "HIGH_RISK"
+    source_breakdown: Dict[str, int] = Field(default_factory=dict)
+    country_breakdown: Dict[str, int] = Field(default_factory=dict)
+    category_breakdown: Dict[str, int] = Field(default_factory=dict)
+    warnings: List[str] = Field(default_factory=list)
+    recommendations: List[str] = Field(default_factory=list)
+
+class ProfileCompletionCoach(BaseModel):
+    completion_percentage: int
+    completed_fields: List[str] = Field(default_factory=list)
+    missing_fields: List[Dict[str, str]] = Field(default_factory=list)
+    estimated_improvement: str
+    quick_tips: List[str] = Field(default_factory=list)
 
 class FundingPlan(BaseModel):
     total_cost_inr: float
@@ -95,6 +143,8 @@ class FundingPlan(BaseModel):
     recommended_strategy: List[StrategyItem]
     eligibility_evaluations: List[OpportunityEligibility] = Field(default_factory=list)
     agent_advice: str
+    rescue_plan: Optional[FundingGapRescuePlan] = None
+    diversity_guardrail: Optional[PortfolioDiversityGuardrail] = None
 
 class AutopilotDraftRequest(BaseModel):
     opportunity_id: str

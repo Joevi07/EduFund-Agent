@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
 import sys
+import uuid
 
 sys.path.append(".")
 
@@ -18,7 +19,8 @@ from models import (
     DocumentAuditResponse,
     StrategySimulateRequest,
     ApplicationRecord,
-    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse, DiscoveryRequest, DraftEvidenceRequest, DraftEvidenceResponse
+    ApplicationStatusUpdate, RegisterRequest, LoginRequest, UserPublic, AuthResponse, DiscoveryRequest, DraftEvidenceRequest, DraftEvidenceResponse,
+    ProfileCompletionCoach
 )
 from data.opportunities import get_all_opportunities, get_opportunity_by_id
 from agents.profile_agent import ProfileAgent
@@ -28,7 +30,8 @@ from agents.planner_agent import PlannerAgent
 from agents.autopilot_agent import AutopilotAgent
 from agents.deadline_agent import DeadlineAgent
 from database import (init_db, list_applications, upsert_application, save_opportunity, create_user,
-    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin, save_student_profile, get_student_profile, platform_readiness)
+    authenticate_user, create_session, get_session_user, delete_session, list_users, bootstrap_admin, save_student_profile, get_student_profile, platform_readiness,
+    save_advisor_brief, get_advisor_brief)
 
 # Initialize SQLite database on startup
 init_db()
@@ -123,15 +126,30 @@ def read_root():
 
 @app.get("/api/health")
 def health_check():
+    from agents.autopilot_agent import _gemini_available
     return {
         "status": "ok", 
         "database": "connected (SQLite edufund.db)",
-        "agents": ["profile", "discovery", "eligibility", "planner", "autopilot", "deadline"]
+        "agents": ["profile", "discovery", "eligibility", "planner", "autopilot", "deadline"],
+        "ai_engine": "gemini-1.5-flash" if _gemini_available() else "rule-based"
+    }
+
+@app.get("/api/llm/status")
+def llm_status():
+    from agents.autopilot_agent import _gemini_available
+    return {
+        "gemini_available": _gemini_available(),
+        "model": "gemini-1.5-flash" if _gemini_available() else None,
+        "message": "AI-powered essay drafts enabled" if _gemini_available() else "Set GEMINI_API_KEY to enable AI drafts"
     }
 
 @app.post("/api/profile/process")
 def process_profile(profile: StudentProfile):
     return profile_agent.process_profile(profile)
+
+@app.post("/api/profile/coach", response_model=ProfileCompletionCoach)
+def get_profile_coach(profile: StudentProfile):
+    return profile_agent.coach_profile(profile)
 
 @app.get("/api/profile/me", response_model=Optional[StudentProfile])
 def get_my_profile(authorization: Optional[str] = Header(None)):
@@ -189,10 +207,58 @@ def generate_funding_plan(profile: StudentProfile, category: Optional[str] = Non
     opps = discovery_agent.discover(profile, category_filter=category)
     return planner_agent.generate_plan(profile, opps)
 
+@app.post("/api/planner/advisor-brief")
+def generate_advisor_brief(profile: StudentProfile):
+    opps = discovery_agent.discover(profile)
+    plan = planner_agent.generate_plan(profile, opps)
+    coach = profile_agent.coach_profile(profile)
+    
+    # Collect required documents
+    unique_docs = set()
+    for item in plan.recommended_strategy:
+        opp = next((o for o in opps if o.id == item.opportunity_id), None)
+        if opp:
+            unique_docs.update(opp.required_documents or [])
+            
+    brief_data = {
+        "student_name": profile.name,
+        "education_level": profile.education_level,
+        "course": profile.course,
+        "location": f"{profile.location.get('city', '')}, {profile.location.get('state', '')}, {profile.location.get('country', '')}".strip(", "),
+        "academic_summary": f"CGPA {profile.academic_profile.get('gpa', 'N/A')}/{profile.academic_profile.get('max_gpa', 10.0)}",
+        "financial_summary": {
+            "target_annual_cost_inr": plan.total_cost_inr,
+            "confirmed_aid_inr": plan.confirmed_aid_inr,
+            "funding_gap_inr": plan.funding_gap_inr,
+            "potential_coverage_inr": plan.potential_coverage_inr,
+            "remaining_gap_inr": plan.remaining_gap_inr,
+            "coverage_percentage": plan.coverage_percentage,
+        },
+        "recommended_strategy": [item.model_dump() for item in plan.recommended_strategy],
+        "rescue_plan": plan.rescue_plan.model_dump() if plan.rescue_plan else None,
+        "diversity_guardrail": plan.diversity_guardrail.model_dump() if plan.diversity_guardrail else None,
+        "required_documents_checklist": sorted(list(unique_docs)),
+        "profile_completion_percentage": coach.completion_percentage,
+        "generated_date": "2026-10-14",
+        "share_token": f"brief_{uuid.uuid4().hex}",
+    }
+    # Save so the share link works publicly
+    save_advisor_brief(brief_data["share_token"], brief_data)
+    return brief_data
+
+@app.get("/api/advisor-brief/{token}")
+def get_public_advisor_brief(token: str):
+    """Public endpoint — no auth required. Returns advisor brief by share token."""
+    brief = get_advisor_brief(token)
+    if not brief:
+        raise HTTPException(status_code=404, detail="Advisor brief not found or expired.")
+    return brief
+
 @app.post("/api/strategy/simulate", response_model=FundingPlan)
 def simulate_strategy_scenario(request: StrategySimulateRequest):
     opps = discovery_agent.discover(request.profile)
     return planner_agent.simulate_scenario(request, opps)
+
 
 @app.post("/api/autopilot/draft", response_model=AutopilotDraftResponse)
 def prepare_autopilot_draft(request: AutopilotDraftRequest, authorization: Optional[str] = Header(None)):

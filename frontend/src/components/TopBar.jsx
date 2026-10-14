@@ -1,8 +1,10 @@
-import React from "react";
-import { Search, IndianRupee, DollarSign } from "lucide-react";
+import React, { useState } from "react";
+import { Search, IndianRupee, DollarSign, Accessibility } from "lucide-react";
+import AccessibilityControls from "./AccessibilityControls";
 
-export default function TopBar({ currency, setCurrency, backendConnected, searchQuery, setSearchQuery, user }) {
+export default function TopBar({ currency, setCurrency, backendConnected, searchQuery, setSearchQuery, user, accessibilitySettings, onAccessibilityChange }) {
   const initials = (user?.name || "S").split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+  const [showA11y, setShowA11y] = useState(false);
 
   return (
     <header className="topbar-glass">
@@ -35,6 +37,38 @@ export default function TopBar({ currency, setCurrency, backendConnected, search
 
       {/* ── RIGHT: Controls ── */}
       <div style={{ display:"flex", alignItems:"center", gap:"1rem", flexShrink:0 }}>
+
+        {/* Accessibility Button */}
+        <div style={{ position:"relative" }}>
+          <button
+            id="a11y-btn"
+            onClick={() => setShowA11y(v => !v)}
+            title="Accessibility & Low-Bandwidth"
+            style={{
+              display:"flex", alignItems:"center", gap:".35rem",
+              background: showA11y ? "rgba(18,163,165,.15)" : "rgba(255,255,255,.7)",
+              backdropFilter:"blur(10px)",
+              border:`1px solid ${showA11y ? "rgba(18,163,165,.4)" : "rgba(18,163,165,.18)"}`,
+              borderRadius:10, padding:".38rem .65rem",
+              cursor:"pointer", fontFamily:"var(--font-main)",
+              color: showA11y ? "var(--teal-700)" : "var(--text-secondary)",
+              fontSize:".75rem", fontWeight:700, transition:"all .18s ease",
+            }}
+          >
+            <Accessibility size={15} /> A11y
+          </button>
+          {showA11y && (
+            <div style={{
+              position:"absolute", top:"calc(100% + 8px)", right:0, zIndex:999,
+              background:"#fff", borderRadius:14, padding:"1.1rem",
+              boxShadow:"0 12px 40px rgba(0,0,0,.15)", border:"1px solid var(--border-subtle)",
+              width:270,
+            }}>
+              <div style={{ fontSize:".75rem", fontWeight:800, color:"var(--text-primary)", marginBottom:".75rem" }}>Accessibility Settings</div>
+              <AccessibilityControls settings={accessibilitySettings} onChange={onAccessibilityChange} />
+            </div>
+          )}
+        </div>
 
         {/* Currency switcher */}
         <div style={{

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { TrendingUp, ShieldCheck, ArrowRight, Zap, Target, Layers, AlertTriangle, Compass, FileText, Kanban, UserCheck, SearchCheck, CircleCheckBig, Calculator } from "lucide-react";
+import { TrendingUp, ShieldCheck, ArrowRight, Zap, Target, Layers, AlertTriangle, Compass, FileText, Kanban, UserCheck, SearchCheck, CircleCheckBig, Calculator, Share2 } from "lucide-react";
 import AgentNodeGraph from "./AgentNodeGraph";
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 import ActionCenter from "./ActionCenter";
+import AdvisorFundingBriefModal from "./AdvisorFundingBriefModal";
 
 export default function DashboardView({ profile, plan, currency, onNavigate, onScenarioResult, opportunitiesCount = 0, opportunities = [], applications = [], documentReadiness = {}, onSelectAutopilot }) {
   const [logFilter, setLogFilter] = useState("All");
   const [showAlert, setShowAlert] = useState(true);
+  const [showAdvisorBrief, setShowAdvisorBrief] = useState(false);
 
   const name    = profile?.name   || "Student";
   const course  = profile?.course || "your course";
@@ -77,9 +79,14 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
             {year && `${year} · `}{course}{city ? ` · ${city}` : ""}
           </p>
         </div>
-        <div style={{ fontSize:".78rem", color:"var(--accent-teal)", fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", gap:".3rem" }}
-          onClick={() => onNavigate("planner")}>
-          View full strategy <ArrowRight size={14}/>
+        <div style={{ display:"flex", alignItems:"center", gap:".75rem", flexWrap:"wrap", justifyContent:"flex-end" }}>
+          <button className="btn-secondary" type="button" onClick={() => setShowAdvisorBrief(true)} style={{ fontSize:".74rem", padding:".42rem .62rem" }}>
+            <Share2 size={14}/> Share with advisor
+          </button>
+          <button type="button" style={{ fontSize:".78rem", color:"var(--accent-teal)", fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", gap:".3rem", background:"none", border:"none" }}
+            onClick={() => onNavigate("planner")}>
+            View full strategy <ArrowRight size={14}/>
+          </button>
         </div>
       </div>
 
@@ -282,6 +289,7 @@ export default function DashboardView({ profile, plan, currency, onNavigate, onS
           </div>
         ))}
       </div>
+      {showAdvisorBrief && <AdvisorFundingBriefModal profile={profile} currency={currency} onClose={() => setShowAdvisorBrief(false)} />}
     </div>
   );
 }

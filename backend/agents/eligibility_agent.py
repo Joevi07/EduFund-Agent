@@ -183,6 +183,60 @@ class EligibilityAgent:
         else:
             reasoning = "The available profile values satisfy the listed eligibility conditions; unlisted provider criteria remain unavailable."
 
+        # Build structured explainability card data
+        profile_facts_helped: List[str] = []
+        conditions_to_verify: List[str] = []
+        readiness_actions: List[str] = []
+
+        for check in checks:
+            if check.status == "PASS":
+                profile_facts_helped.append(check.detail)
+            elif check.status in ("UNAVAILABLE", "WARN"):
+                conditions_to_verify.append(check.detail)
+
+        # Actionable readiness recommendations
+        req_docs = opp.required_documents or []
+        if req_docs:
+            readiness_actions.append(f"Upload required documents: {', '.join(req_docs[:2])} in Autopilot Studio.")
+        if any(c.criterion == "Financial Eligibility" and c.status == "PASS" for c in checks):
+            readiness_actions.append("Upload certified income certificate to verify income threshold before deadline.")
+        if opp.essay_prompts:
+            readiness_actions.append(f"Draft tailored statement for prompt: '{opp.essay_prompts[0][:60]}...'")
+        if not readiness_actions:
+            readiness_actions.append("Review official provider link to confirm latest intake guidelines and dates.")
+
+        # Why this match natural language synthesis
+        academic_fact = f"CGPA {raw_gpa}/{max_gpa}" if raw_gpa > 0 else "Academic credentials"
+        level_fact = student_level if student_level else "student"
+        course_fact = student_course if student_course else "your programme"
+
+        if score >= 70:
+            income_summary = f"Annual family income (₹{student_income:,.0f}) is within the programme ceiling." if (opp.max_family_income_inr and student_income > 0) else "Financial profile matches standard criteria."
+            action_snippet = readiness_actions[0] if readiness_actions else "Complete checklist in Autopilot Studio."
+            why_matched = (
+                f"Matched because you are an {level_fact} {course_fact} student with {academic_fact}. "
+                f"{income_summary} {action_snippet}"
+            )
+        elif score >= 40:
+            why_matched = (
+                f"Partially aligned for {level_fact} in {course_fact}. "
+                f"Requires verification of {len(conditions_to_verify)} condition{'s' if len(conditions_to_verify) != 1 else ''}. "
+                f"{readiness_actions[0] if readiness_actions else 'Check official source.'}"
+            )
+        else:
+            why_matched = (
+                f"Low alignment: {failed_count} condition{'s' if failed_count != 1 else ''} did not match your current profile. "
+                "Review requirements on the official source."
+            )
+
+        explainability = {
+            "why_matched": why_matched,
+            "profile_facts_helped": profile_facts_helped if profile_facts_helped else ["General study level alignment"],
+            "conditions_to_verify": conditions_to_verify if conditions_to_verify else ["Provider final verification at submission"],
+            "readiness_actions": readiness_actions,
+            "match_strength_label": rating,
+        }
+
         return OpportunityEligibility(
             opportunity_id=opp.id,
             title=opp.title,
@@ -193,4 +247,6 @@ class EligibilityAgent:
             rating=rating,
             checks=checks,
             key_reasoning=reasoning,
+            explainability=explainability,
         )
+

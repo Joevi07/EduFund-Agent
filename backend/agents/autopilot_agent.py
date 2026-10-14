@@ -2,16 +2,45 @@ import os
 import re
 from typing import Optional, List, Dict, Any
 from models import (
-    StudentProfile, 
-    Opportunity, 
+    StudentProfile,
+    Opportunity,
     AutopilotDraftResponse,
     DraftRefineRequest,
     DraftRefineResponse,
     DocumentAuditRequest,
-    DocumentAuditResponse
-    , DraftEvidenceRequest, DraftEvidenceResponse, EvidenceFinding
+    DocumentAuditResponse,
+    DraftEvidenceRequest, DraftEvidenceResponse, EvidenceFinding
 )
 from data.opportunities import get_opportunity_by_id
+
+# ── Gemini LLM Setup (graceful fallback if key is absent) ─────────────────
+_gemini_model = None
+try:
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if api_key:
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        _gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+        print(f"[AutopilotAgent] ✅ Gemini 1.5 Flash loaded — AI-powered drafts enabled.")
+    else:
+        print("[AutopilotAgent] ℹ️  GEMINI_API_KEY not set — using rule-based draft fallback.")
+except Exception as _e:
+    print(f"[AutopilotAgent] ⚠️  Gemini init failed ({_e}) — using rule-based fallback.")
+
+
+def _gemini_available() -> bool:
+    return _gemini_model is not None
+
+
+def _call_gemini(prompt: str, fallback: str) -> str:
+    """Call Gemini, return fallback text on any error."""
+    try:
+        response = _gemini_model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"[AutopilotAgent] Gemini call failed: {e}")
+        return fallback
+
 
 class AutopilotAgent:
     def __init__(self):
@@ -49,21 +78,61 @@ class AutopilotAgent:
         prompts = opp.essay_prompts if opp.essay_prompts else ["Why are you the ideal candidate for this funding opportunity?"]
         selected_prompt = prompts[min(prompt_index, len(prompts) - 1)]
 
-        achievements_str = ", ".join(profile.achievements)
-        interests_str = ", ".join(profile.interests)
-
+        achievements_str = ", ".join(profile.achievements) if profile.achievements else "strong academic record"
+        interests_str = ", ".join(profile.interests) if profile.interests else "technology and innovation"
         gpa_value = profile.academic_profile.get("gpa", 3.8)
         gpa_scale = profile.academic_profile.get("max_gpa", 4.0)
-        draft = (
+        income = profile.financial_constraints.get("annual_family_income_inr", 0)
+        target_cost = profile.financial_constraints.get("target_annual_cost_inr", 120000)
+
+        # ── Rule-based fallback draft ──────────────────────────────────────
+        fallback_draft = (
             f"As a dedicated {profile.education_level} student specializing in {profile.course} with a GPA of "
             f"{gpa_value}/{gpa_scale}, I am writing to apply for the {opp.title}.\n\n"
             f"My academic journey is driven by a deep passion for {interests_str}. Throughout my studies, I have consistently "
             f"striven for excellence, as demonstrated by my key achievements including: {achievements_str}.\n\n"
             f"Receiving the {opp.title} from {opp.provider} would provide vital support for my target educational expenses "
-            f"(annual target cost of ₹{profile.financial_constraints.get('target_annual_cost_inr', 120000):,}), allowing me to "
+            f"(annual target cost of ₹{target_cost:,}), allowing me to "
             f"focus entirely on technical innovation and research rather than financial constraints. I look forward to contributing "
             f"back to the community through leadership and impactful projects."
         )
+
+        # ── Gemini-powered draft ───────────────────────────────────────────
+        if _gemini_available():
+            gemini_prompt = f"""You are an expert scholarship application writer helping a student craft a compelling, 
+personal, and persuasive 250–300 word personal statement for a funding opportunity.
+
+STUDENT PROFILE:
+- Name: {profile.name}
+- Education Level: {profile.education_level}
+- Course/Field: {profile.course}
+- GPA: {gpa_value}/{gpa_scale}
+- Location: {profile.location.get('city', '')}, {profile.location.get('state', '')}, {profile.location.get('country', 'India')}
+- Annual Family Income: ₹{income:,}
+- Target Annual Education Cost: ₹{target_cost:,}
+- Key Achievements: {achievements_str}
+- Academic Interests: {interests_str}
+
+FUNDING OPPORTUNITY:
+- Name: {opp.title}
+- Provider: {opp.provider}
+- Amount: ₹{opp.amount_inr:,.0f}
+- Description: {opp.description[:300]}
+
+ESSAY PROMPT: "{selected_prompt}"
+
+Write a compelling, authentic personal statement (250-300 words) that:
+1. Opens with a powerful hook specific to this student's background
+2. Connects their specific achievements to the scholarship's mission
+3. Explains the financial need clearly and honestly (mention their family income vs education cost)
+4. Describes how this award will enable their specific goals
+5. Ends with a confident, memorable closing
+
+Write only the essay text, no headers or labels. Make it feel deeply personal, not generic."""
+
+            draft = _call_gemini(gemini_prompt, fallback_draft)
+        else:
+            draft = fallback_draft
 
         checklist = []
         for doc in opp.required_documents:
@@ -79,7 +148,7 @@ class AutopilotAgent:
             "item": "Tailored Statement of Purpose / Essay Draft",
             "type": "ESSAY",
             "status": "DRAFT_PREPARED",
-            "notes": "Generated by Autopilot Agent; requires student review."
+            "notes": f"{'AI-generated by Gemini 1.5 Flash' if _gemini_available() else 'Generated by Autopilot Agent'}; requires student review."
         })
         checklist.append({
             "item": "Final Human Review & Safety Sign-off",
@@ -102,28 +171,55 @@ class AutopilotAgent:
         instr = req.instruction.lower()
         draft = req.current_draft
 
-        if "persuasive" in instr or "impact" in instr:
-            refined = (
-                "DEEP IMPACT REFINEMENT:\n" + draft + 
-                "\n\nFurthermore, my track record in high-stakes hackathons and open-source contributions demonstrates "
-                "my relentless drive to translate technical research into tangible, real-world societal impact."
-            )
-            style = "High Impact & Persuasive"
-        elif "academic" in instr or "rigor" in instr:
-            refined = (
-                "ACADEMIC RIGOR REFINEMENT:\n" + draft + 
-                "\n\nMy analytical foundation in algorithmic complexity, machine learning architectures, and empirical research "
-                "positions me to excel in advanced research endeavors."
-            )
-            style = "Academic & Scholarly"
-        elif "shorten" in instr or "concise" in instr:
-            words = draft.split()
-            shortened = " ".join(words[:min(100, len(words))]) + "..."
-            refined = "CONCISE SUMMARY REFINEMENT:\n" + shortened
-            style = "Concise (<100 words)"
+        # ── Gemini-powered refinement ──────────────────────────────────────
+        if _gemini_available():
+            style_map = {
+                "persuasive": "highly persuasive and emotionally compelling, with vivid storytelling",
+                "impact": "focused on measurable social and academic impact, using strong action verbs",
+                "academic": "scholarly and rigorous with precise language appropriate for academic committees",
+                "shorten": "concise (under 120 words) while preserving the most powerful points",
+                "concise": "concise (under 120 words) while preserving the most powerful points",
+                "technical": "technically specific, highlighting engineering skills and technical achievements",
+            }
+            style_desc = next((v for k, v in style_map.items() if k in instr), "balanced, professional, and polished")
+            gemini_prompt = f"""Rewrite the following scholarship essay to be {style_desc}.
+Keep the student's authentic voice. Do not add false claims. Output only the rewritten essay text.
+
+ORIGINAL ESSAY:
+{draft}"""
+            refined = _call_gemini(gemini_prompt, draft)
+            if "persuasive" in instr or "impact" in instr:
+                style = "High Impact & Persuasive (Gemini AI)"
+            elif "academic" in instr or "rigor" in instr:
+                style = "Academic & Scholarly (Gemini AI)"
+            elif "shorten" in instr or "concise" in instr:
+                style = "Concise (Gemini AI)"
+            else:
+                style = f"Refined: {req.instruction.title()} (Gemini AI)"
         else:
-            refined = draft + "\n\n[Refined with enhanced technical specificity and career clarity.]"
-            style = "Balanced Professional"
+            # Rule-based fallback
+            if "persuasive" in instr or "impact" in instr:
+                refined = (
+                    "DEEP IMPACT REFINEMENT:\n" + draft +
+                    "\n\nFurthermore, my track record in high-stakes hackathons and open-source contributions demonstrates "
+                    "my relentless drive to translate technical research into tangible, real-world societal impact."
+                )
+                style = "High Impact & Persuasive"
+            elif "academic" in instr or "rigor" in instr:
+                refined = (
+                    "ACADEMIC RIGOR REFINEMENT:\n" + draft +
+                    "\n\nMy analytical foundation in algorithmic complexity, machine learning architectures, and empirical research "
+                    "positions me to excel in advanced research endeavors."
+                )
+                style = "Academic & Scholarly"
+            elif "shorten" in instr or "concise" in instr:
+                words = draft.split()
+                shortened = " ".join(words[:min(100, len(words))]) + "..."
+                refined = "CONCISE SUMMARY REFINEMENT:\n" + shortened
+                style = "Concise (<100 words)"
+            else:
+                refined = draft + "\n\n[Refined with enhanced technical specificity and career clarity.]"
+                style = "Balanced Professional"
 
         word_cnt = len(refined.split())
         mins = round(word_cnt / 200.0, 1)
@@ -362,9 +458,9 @@ class AutopilotAgent:
                     suggestion="Confirm it is accurate and add a specific example only if one genuinely applies.",
                 ))
 
-        supported_count = len([finding for finding in findings if finding.status == "SUPPORTED"])
-        needs_evidence_count = len([finding for finding in findings if finding.status == "NEEDS_EVIDENCE"])
-        review_count = len([finding for finding in findings if finding.status == "REVIEW"])
+        supported_count = len([f for f in findings if f.status == "SUPPORTED"])
+        needs_evidence_count = len([f for f in findings if f.status == "NEEDS_EVIDENCE"])
+        review_count = len([f for f in findings if f.status == "REVIEW"])
         return DraftEvidenceResponse(
             supported_count=supported_count,
             needs_evidence_count=needs_evidence_count,

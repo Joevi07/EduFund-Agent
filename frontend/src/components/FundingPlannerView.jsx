@@ -3,6 +3,8 @@ import { Bot, Calculator, ExternalLink, Info, Layers, Target, TrendingUp, Zap } 
 import StrategySimulatorWidget from "./StrategySimulatorWidget";
 import { hasSourceUrl } from "../utils/actionCenter";
 import { buildSuggestedFundingBundle } from "../utils/fundingBundle";
+import FundingGapRescuePlan from "./FundingGapRescuePlan";
+import DiversityGuardrailCard from "./DiversityGuardrailCard";
 
 const CHECK_LABEL = { PASS:"Satisfied", FAIL:"Unsatisfied", WARN:"Review", UNAVAILABLE:"Unavailable" };
 const CHECK_COLOR = { PASS:"#16713a", FAIL:"#b42318", WARN:"#a15c00", UNAVAILABLE:"#667085" };
@@ -234,6 +236,12 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
           </table>
         </div>
       </div>
+
+      {/* ── Funding Gap Rescue Plan ── */}
+      {plan.rescue_plan && <FundingGapRescuePlan rescuePlan={plan.rescue_plan} currency={currency} />}
+
+      {/* ── Portfolio Diversity Guardrail ── */}
+      {plan.diversity_guardrail && <DiversityGuardrailCard diversityGuardrail={plan.diversity_guardrail} />}
     </div>
   );
 }

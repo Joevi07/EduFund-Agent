@@ -98,6 +98,23 @@ def init_db():
         )
     """)
 
+    # Add new opportunity columns if migrating existing db
+    existing_opp_cols = {row[1] for row in cursor.execute("PRAGMA table_info(opportunities)")}
+    new_cols = [
+        ("last_reviewed_date", "TEXT DEFAULT '2026-10-01'"),
+        ("source_verified", "INTEGER DEFAULT 1"),
+        ("is_official_domain", "INTEGER DEFAULT 1"),
+        ("requires_application_fee", "INTEGER DEFAULT 0"),
+        ("country", "TEXT DEFAULT 'India'"),
+        ("safety_audit", "TEXT DEFAULT '{}'"),
+    ]
+    for col_name, col_def in new_cols:
+        if col_name not in existing_opp_cols:
+            try:
+                cursor.execute(f"ALTER TABLE opportunities ADD COLUMN {col_name} {col_def}")
+            except Exception:
+                pass
+
     # Student Profiles Table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS student_profiles (
@@ -111,6 +128,13 @@ def init_db():
 
     cursor.execute("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'student', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
     cursor.execute("CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at TIMESTAMP NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS advisor_briefs (
+            token TEXT PRIMARY KEY,
+            brief_json TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     _migrate_applications_table(cursor)
 
     conn.commit()
@@ -215,11 +239,26 @@ def save_opportunity(opportunity: Dict[str, Any]) -> None:
     item = dict(opportunity)
     for field in fields:
         item[field] = json.dumps(item.get(field, []))
+    item["safety_audit"] = json.dumps(item.get("safety_audit", {}))
+    item.setdefault("last_reviewed_date", "2026-10-01")
+    item.setdefault("source_verified", 1)
+    item.setdefault("is_official_domain", 1)
+    item.setdefault("requires_application_fee", 0)
+    item.setdefault("country", "India")
+
     conn = get_db_connection()
     conn.execute("""
-        INSERT INTO opportunities VALUES (:id, :title, :provider, :category, :amount_inr, :amount_usd,
-          :deadline, :days_left, :degree_levels, :target_courses, :min_gpa, :max_family_income_inr,
-          :location_restrictions, :description, :required_documents, :essay_prompts, :website_url, :urgency)
+        INSERT INTO opportunities (
+            id, title, provider, category, amount_inr, amount_usd,
+            deadline, days_left, degree_levels, target_courses, min_gpa, max_family_income_inr,
+            location_restrictions, description, required_documents, essay_prompts, website_url, urgency,
+            last_reviewed_date, source_verified, is_official_domain, requires_application_fee, country, safety_audit
+        ) VALUES (
+            :id, :title, :provider, :category, :amount_inr, :amount_usd,
+            :deadline, :days_left, :degree_levels, :target_courses, :min_gpa, :max_family_income_inr,
+            :location_restrictions, :description, :required_documents, :essay_prompts, :website_url, :urgency,
+            :last_reviewed_date, :source_verified, :is_official_domain, :requires_application_fee, :country, :safety_audit
+        )
         ON CONFLICT(id) DO UPDATE SET
           title=excluded.title, provider=excluded.provider, category=excluded.category,
           amount_inr=excluded.amount_inr, amount_usd=excluded.amount_usd, deadline=excluded.deadline,
@@ -227,7 +266,10 @@ def save_opportunity(opportunity: Dict[str, Any]) -> None:
           min_gpa=excluded.min_gpa, max_family_income_inr=excluded.max_family_income_inr,
           location_restrictions=excluded.location_restrictions, description=excluded.description,
           required_documents=excluded.required_documents, essay_prompts=excluded.essay_prompts,
-          website_url=excluded.website_url, urgency=excluded.urgency
+          website_url=excluded.website_url, urgency=excluded.urgency,
+          last_reviewed_date=excluded.last_reviewed_date, source_verified=excluded.source_verified,
+          is_official_domain=excluded.is_official_domain, requires_application_fee=excluded.requires_application_fee,
+          country=excluded.country, safety_audit=excluded.safety_audit
     """, item)
     conn.commit()
     conn.close()
@@ -238,5 +280,37 @@ def load_opportunities() -> List[Dict[str, Any]]:
     conn.close()
     for row in rows:
         for field in ("degree_levels", "target_courses", "location_restrictions", "required_documents", "essay_prompts"):
-            row[field] = json.loads(row[field])
+            if isinstance(row.get(field), str):
+                row[field] = json.loads(row[field])
+        if isinstance(row.get("safety_audit"), str):
+            try:
+                row["safety_audit"] = json.loads(row["safety_audit"])
+            except Exception:
+                row["safety_audit"] = {}
+        row.setdefault("last_reviewed_date", "2026-10-01")
+        row.setdefault("source_verified", True)
+        row.setdefault("is_official_domain", True)
+        row.setdefault("requires_application_fee", False)
+        row.setdefault("country", "India")
     return rows
+
+
+def save_advisor_brief(token: str, brief_data: Dict[str, Any]) -> None:
+    """Persist an advisor brief so it can be retrieved via a public share link."""
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO advisor_briefs (token, brief_json) VALUES (?, ?) "
+        "ON CONFLICT(token) DO UPDATE SET brief_json=excluded.brief_json, created_at=CURRENT_TIMESTAMP",
+        (token, json.dumps(brief_data, default=str))
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_advisor_brief(token: str) -> Optional[Dict[str, Any]]:
+    """Retrieve a previously saved advisor brief by its share token."""
+    conn = get_db_connection()
+    row = conn.execute("SELECT brief_json FROM advisor_briefs WHERE token = ?", (token,)).fetchone()
+    conn.close()
+    return json.loads(row["brief_json"]) if row else None
+
