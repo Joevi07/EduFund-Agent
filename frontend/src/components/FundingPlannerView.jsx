@@ -238,7 +238,7 @@ export default function FundingPlannerView({ plan, profile, currency, onNavigate
       </div>
 
       {/* ── Funding Gap Rescue Plan ── */}
-      {plan.rescue_plan && <FundingGapRescuePlan rescuePlan={plan.rescue_plan} currency={currency} />}
+      {plan.rescue_plan && <FundingGapRescuePlan rescuePlan={plan.rescue_plan} currency={currency} onNavigate={onNavigate} />}
 
       {/* ── Portfolio Diversity Guardrail ── */}
       {plan.diversity_guardrail && <DiversityGuardrailCard diversityGuardrail={plan.diversity_guardrail} />}

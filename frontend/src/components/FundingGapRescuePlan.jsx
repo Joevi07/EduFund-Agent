@@ -8,7 +8,7 @@ const LAYER_ICONS = {
   "Education Loan Readiness": { icon: BookOpen,       color: "#d97706", bg: "rgba(217,119,6,.1)"  },
 };
 
-function RescueLayer({ comp, currency, usdRate = 83 }) {
+function RescueLayer({ comp, currency, onNavigate, usdRate = 83 }) {
   const [open, setOpen] = useState(false);
   const isINR = currency === "INR";
   const fmt = (inr) => isINR ? `₹${inr.toLocaleString()}` : `$${(inr / usdRate).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -46,11 +46,11 @@ function RescueLayer({ comp, currency, usdRate = 83 }) {
               ))}
             </div>
           )}
-          <button style={{
+          <button type="button" onClick={() => onNavigate?.("discovery")} style={{
             marginTop: ".75rem", padding: ".35rem .85rem", fontSize: ".72rem", fontWeight: 700,
             background: color, color: "#fff", border: "none", borderRadius: 8, cursor: "pointer",
           }}>
-            {comp.action_label} →
+            {comp.action_label || "View matching opportunities"} →
           </button>
         </div>
       )}
@@ -58,7 +58,7 @@ function RescueLayer({ comp, currency, usdRate = 83 }) {
   );
 }
 
-export default function FundingGapRescuePlan({ rescuePlan, currency }) {
+export default function FundingGapRescuePlan({ rescuePlan, currency, onNavigate }) {
   if (!rescuePlan) return null;
   const isINR = currency === "INR";
   const fmt = (inr, usd) => isINR ? `₹${Number(inr).toLocaleString()}` : `$${Number(usd).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -82,7 +82,7 @@ export default function FundingGapRescuePlan({ rescuePlan, currency }) {
       <div style={{ margin: "1rem 0 .75rem", padding: ".85rem 1rem", background: "rgba(8,145,178,.08)", border: "1px solid rgba(8,145,178,.2)", borderRadius: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: ".5rem" }}>
           <span style={{ fontSize: ".8rem", fontWeight: 700, color: "#0891b2" }}>Total Rescue Coverage</span>
-          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0891b2" }}>{coveragePct}%</span>
+          <button type="button" onClick={() => onNavigate?.("discovery")} title="Review matching funding opportunities" style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0891b2", cursor: "pointer", background: "transparent", border: "none", padding: 0 }}>{coveragePct}%</button>
         </div>
         <div style={{ height: 8, background: "rgba(8,145,178,.15)", borderRadius: 999, overflow: "hidden" }}>
           <div style={{ width: `${coveragePct}%`, height: "100%", background: "linear-gradient(90deg,#0891b2,#06b6d4)", borderRadius: 999, transition: "width .4s ease" }} />
@@ -99,7 +99,7 @@ export default function FundingGapRescuePlan({ rescuePlan, currency }) {
       {/* Layers */}
       <div style={{ display: "flex", flexDirection: "column", gap: ".55rem" }}>
         {(rescuePlan.components || []).map((comp, i) => (
-          <RescueLayer key={i} comp={comp} currency={currency} />
+          <RescueLayer key={i} comp={comp} currency={currency} onNavigate={onNavigate} />
         ))}
       </div>
     </div>

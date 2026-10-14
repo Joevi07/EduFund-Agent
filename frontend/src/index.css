@@ -102,6 +102,28 @@
   --shadow-modal: 0 24px 80px rgba(10,50,50,.22);
 }
 
+/* Accessibility preferences are scoped to the application and saved locally. */
+.app-layout.a11y-font-large { font-size: 112.5%; }
+.app-layout.a11y-font-xlarge { font-size: 125%; }
+.app-layout.a11y-high-contrast {
+  --bg-canvas: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-solid: #ffffff;
+  --bg-topbar: #ffffff;
+  --bg-sidebar: #ffffff;
+  --text-primary: #071b1b;
+  --text-secondary: #163333;
+  --text-muted: #315858;
+  --border-subtle: rgba(7, 27, 27, .35);
+  --border-card: rgba(7, 27, 27, .42);
+  --accent-teal: #006b6e;
+}
+.app-layout.a11y-high-contrast .bento-box,
+.app-layout.a11y-high-contrast .topbar-glass { box-shadow: none !important; }
+.app-layout.a11y-low-bandwidth *,
+.app-layout.a11y-low-bandwidth *::before,
+.app-layout.a11y-low-bandwidth *::after { animation: none !important; transition: none !important; backdrop-filter: none !important; }
+
 /* ═══════════════════════════════════════════════════════════════
    RESET
 ═══════════════════════════════════════════════════════════════ */

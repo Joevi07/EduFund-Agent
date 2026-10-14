@@ -58,6 +58,13 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [backendConnected, setBackendConnected] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [accessibilitySettings, setAccessibilitySettings] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("edufund_accessibility")) || { fontSize: "normal", highContrast: false, lowBandwidth: false };
+    } catch {
+      return { fontSize: "normal", highContrast: false, lowBandwidth: false };
+    }
+  });
 
   const [profile, setProfile] = useState(INITIAL_PROFILE);
   const [opportunities, setOpportunities] = useState([]);
@@ -133,6 +140,10 @@ export default function App() {
     initData();
   }, [auth]);
 
+  useEffect(() => {
+    localStorage.setItem("edufund_accessibility", JSON.stringify(accessibilitySettings));
+  }, [accessibilitySettings]);
+
   const handleSaveProfile = async (updatedProfile) => {
     const saved = await saveMyProfile(updatedProfile, auth.token).catch(() => updatedProfile);
     setProfile(saved);
@@ -170,7 +181,7 @@ export default function App() {
   if (!auth) return <AuthView onAuthenticated={handleAuthenticated} />;
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout a11y-font-${accessibilitySettings.fontSize} ${accessibilitySettings.highContrast ? "a11y-high-contrast" : ""} ${accessibilitySettings.lowBandwidth ? "a11y-low-bandwidth" : ""}`}>
       {/* Collapsible Left Sidebar */}
       <Sidebar 
         activeTab={activeTab}
@@ -191,6 +202,8 @@ export default function App() {
           user={auth.user}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          accessibilitySettings={accessibilitySettings}
+          onAccessibilityChange={setAccessibilitySettings}
         />
 
         <main style={{ flex: 1, padding: "2rem", maxWidth: "1600px", width: "100%", margin: "0 auto" }}>
